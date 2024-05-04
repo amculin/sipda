@@ -40,3 +40,8 @@ tests/_support/_generated
 /runtime
 /vagrant
 /tests
+LICENSE.md
+Vagrantfile
+codeception.yml
+docker-compose.yml
+requirements.php
