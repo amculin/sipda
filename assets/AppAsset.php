@@ -20,12 +20,19 @@ class AppAsset extends AssetBundle
     public $basePath = '@webroot';
     public $baseUrl = '@web';
     public $css = [
-        'css/site.css',
+        'css/tabler.min.css',
+        'css/custom.css',
+        'css/login.css',
+        'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css',
+        'https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css'
     ];
     public $js = [
+        'js/tabler.min.js',
+        'js/app.js',
+        'https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js'
     ];
     public $depends = [
         'yii\web\YiiAsset',
-        'yii\bootstrap5\BootstrapAsset'
+        //'yii\bootstrap5\BootstrapAsset'
     ];
 }
