@@ -4,7 +4,7 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
-    'id' => 'basic',
+    'id' => 'Aplikasi Pengadaan Barang',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'aliases' => [
@@ -46,27 +46,28 @@ $config = [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                'login' => 'site/login'
             ],
         ],
     ],
     'params' => $params,
-	'modules' => [
-		'broadcasts' => [
+    'modules' => [
+        'broadcasts' => [
             'class' => 'app\modules\broadcasts\Module',
         ],
-		'clients' => [
+        'clients' => [
             'class' => 'app\modules\clients\Module',
         ],
-		'prospects' => [
+        'prospects' => [
             'class' => 'app\modules\prospects\Module',
         ],
         'references' => [
             'class' => 'app\modules\references\Module',
         ],
-		'sales' => [
+        'sales' => [
             'class' => 'app\modules\sales\Module',
         ]
-    ],
+    ]
 ];
 
 if (YII_ENV_DEV) {
