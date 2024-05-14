@@ -29,6 +29,8 @@ class FLinkPager extends LinkPager
             $this->registerLinkTags();
         }
 
+        $this->getView()->registerCss("li.disabled { margin-top: 3px; }");
+
         echo $this->renderPagination();
     }
 
