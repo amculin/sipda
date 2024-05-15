@@ -3,10 +3,12 @@
 /** @var string $content */
 
 use app\assets\MainAsset;
+use app\assets\DeleteAlertAsset;
 use yii\bootstrap5\Html;
 use yii\web\View;
 
 MainAsset::register($this);
+DeleteAlertAsset::register($this);
 $this->beginPage();
 ?>
 <!doctype html>
