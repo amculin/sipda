@@ -2,103 +2,163 @@
 
 namespace app\models;
 
-class User extends \yii\base\BaseObject implements \yii\web\IdentityInterface
+use Yii;
+
+/**
+ * This is the model class for table "user".
+ *
+ * @property int $id
+ * @property int $id_unit
+ * @property int $id_grup
+ * @property string $username
+ * @property string $password
+ * @property string|null $auth_key
+ * @property string $nama
+ * @property string $email
+ * @property string|null $jabatan
+ * @property int $komisi_jabatan
+ * @property int $is_disabled
+ * @property string|null $last_login
+ * @property string $timestamp
+ *
+ * @property BroadcastConfig[] $broadcastConfigs
+ * @property Broadcast[] $broadcasts
+ * @property Channel[] $channels
+ * @property UserGrup $grup
+ * @property Klien[] $kliens
+ * @property Lead[] $leads
+ * @property Plan[] $plans
+ * @property Unit $unit
+ */
+class User extends \yii\db\ActiveRecord
 {
-    public $id;
-    public $username;
-    public $password;
-    public $authKey;
-    public $accessToken;
-
-    private static $users = [
-        '100' => [
-            'id' => '100',
-            'username' => 'admin',
-            'password' => 'admin',
-            'authKey' => 'test100key',
-            'accessToken' => '100-token',
-        ],
-        '101' => [
-            'id' => '101',
-            'username' => 'demo',
-            'password' => 'demo',
-            'authKey' => 'test101key',
-            'accessToken' => '101-token',
-        ],
-    ];
-
+    const IS_DISABLED = 1;
+    const IS_NOT_DISABLED = 0;
 
     /**
      * {@inheritdoc}
      */
-    public static function findIdentity($id)
+    public static function tableName()
     {
-        return isset(self::$users[$id]) ? new static(self::$users[$id]) : null;
+        return 'user';
     }
 
     /**
      * {@inheritdoc}
      */
-    public static function findIdentityByAccessToken($token, $type = null)
+    public function rules()
     {
-        foreach (self::$users as $user) {
-            if ($user['accessToken'] === $token) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return [
+            [['id_unit', 'id_grup', 'username', 'password', 'nama', 'email'], 'required'],
+            [['id_unit', 'id_grup', 'komisi_jabatan', 'is_disabled'], 'integer'],
+            [['last_login', 'timestamp'], 'safe'],
+            [['username', 'password'], 'string', 'max' => 64],
+            [['auth_key', 'nama', 'email', 'jabatan'], 'string', 'max' => 128],
+            [['username'], 'unique'],
+            [['id_unit'], 'exist', 'skipOnError' => true, 'targetClass' => Unit::class, 'targetAttribute' => ['id_unit' => 'id']],
+            [['id_grup'], 'exist', 'skipOnError' => true, 'targetClass' => UserGrup::class, 'targetAttribute' => ['id_grup' => 'id']],
+        ];
     }
 
     /**
-     * Finds user by username
+     * {@inheritdoc}
+     */
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'id_unit' => 'ID Unit',
+            'id_grup' => 'ID Grup',
+            'username' => 'Username',
+            'password' => 'Password',
+            'auth_key' => 'Auth Key',
+            'nama' => 'Nama',
+            'email' => 'Email',
+            'jabatan' => 'Jabatan',
+            'komisi_jabatan' => 'Komisi Jabatan',
+            'is_disabled' => 'Is Disabled',
+            'last_login' => 'Last Login',
+            'timestamp' => 'Timestamp',
+        ];
+    }
+
+    /**
+     * Gets query for [[BroadcastConfigs]].
      *
-     * @param string $username
-     * @return static|null
+     * @return \yii\db\ActiveQuery
      */
-    public static function findByUsername($username)
+    public function getBroadcastConfigs()
     {
-        foreach (self::$users as $user) {
-            if (strcasecmp($user['username'], $username) === 0) {
-                return new static($user);
-            }
-        }
-
-        return null;
+        return $this->hasMany(BroadcastConfig::class, ['id_sales' => 'id']);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getAuthKey()
-    {
-        return $this->authKey;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function validateAuthKey($authKey)
-    {
-        return $this->authKey === $authKey;
-    }
-
-    /**
-     * Validates password
+     * Gets query for [[Broadcasts]].
      *
-     * @param string $password password to validate
-     * @return bool if password provided is valid for current user
+     * @return \yii\db\ActiveQuery
      */
-    public function validatePassword($password)
+    public function getBroadcasts()
     {
-        return $this->password === $password;
+        return $this->hasMany(Broadcast::class, ['id_sales' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Channels]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getChannels()
+    {
+        return $this->hasMany(Channel::class, ['id_sales' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Grup]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGrup()
+    {
+        return $this->hasOne(UserGrup::class, ['id' => 'id_grup']);
+    }
+
+    /**
+     * Gets query for [[Kliens]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getKliens()
+    {
+        return $this->hasMany(Klien::class, ['id_sales' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Leads]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getLeads()
+    {
+        return $this->hasMany(Lead::class, ['id_sales' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Plans]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getPlans()
+    {
+        return $this->hasMany(Plan::class, ['id_sales' => 'id']);
+    }
+
+    /**
+     * Gets query for [[Unit]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUnit()
+    {
+        return $this->hasOne(Unit::class, ['id' => 'id_unit']);
     }
 }
