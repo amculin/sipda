@@ -19,7 +19,7 @@ class UserSearch extends User
     {
         return [
             [['id', 'id_unit', 'id_grup', 'komisi_jabatan', 'is_disabled'], 'integer'],
-            [['username', 'password', 'auth_key', 'nama', 'email', 'jabatan', 'last_login', 'timestamp'], 'safe'],
+            [['username', 'nama', 'email', 'id_grup', 'last_login', 'timestamp'], 'safe'],
         ];
     }
 
@@ -41,17 +41,28 @@ class UserSearch extends User
      */
     public function search($params)
     {
-        $where = '';
+        $filters = [];
         $bound = [];
 
         $this->load($params);
 
-        /* if ($this->name) {
-            $where .= ' WHERE name LIKE :name';
-            $bound[':name'] = "%{$this->name}%";
-        } */
+        if ($this->id_grup) {
+            $filters[] = 'u.id_grup = :groupID';
+            $bound[':groupID'] = $this->id_grup;
+        }
 
-        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM user' . $where, $bound)->queryScalar();
+        if ($this->nama) {
+            $filters[] = 'u.username LIKE :name OR u.nama LIKE :name OR u.email LIKE :name';
+            $bound[':name'] = "%{$this->nama}%";
+        }
+
+        if (count($filters) > 0) {
+            $where = ' WHERE ' . implode(' AND ', $filters);
+        } else {
+            $where = '';
+        }
+
+        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM user u' . $where, $bound)->queryScalar();
         $sql = "SELECT u.id, u.id_grup, u.username, u.nama, u.email, u.jabatan, ug.nama AS role  FROM user u
         LEFT JOIN user_grup ug ON (ug.id = u.id_grup)
         {$where}";

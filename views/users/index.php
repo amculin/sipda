@@ -3,11 +3,10 @@
 use app\assets\FormModalAsset;
 use app\customs\FActionColumn;
 use app\customs\FDeleteAlert;
-use app\models\Province;
+use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\grid\ActionColumn;
-use yii\grid\GridView;
+use yii\widgets\ActiveForm;
 
 $this->title = 'Provinces';
 $this->params['breadcrumbs'][] = $this->title;
@@ -40,11 +39,23 @@ $this->params['breadcrumbs'][] = $this->title;
                         <i class="bi bi-plus"></i>
                         Tambah Data
                     </a>
-                    <div class="ms-auto">
+                    <div class="ms-auto d-flex gap-2">
+                        <?php $form = ActiveForm::begin([
+                            'action' => ['index'],
+                            'method' => 'get',
+                            'options' => ['style' => 'display: contents;']
+                        ]); ?>
+                        <?= $form->field($searchModel, 'id_grup', ['options' => ['tag' => false]])->dropDownList($roleList, [
+                            'prompt' => 'Semua Role',
+                            'class' => 'form-select',
+                            'style' => 'width: 160px;',
+                            'tag' => false
+                        ])->label(false); ?>
                         <div class="input-group">
-                            <input type="text" class="form-control" placeholder="Cari data..">
-                            <button class="btn"><i class="bi bi-search"></i></button>
+                            <?= $form->field($searchModel, 'nama', ['options' => ['tag' => false]])->textInput(['placeholder' => 'Cari data..', 'tag' => false])->label(false); ?>
+                            <?= Html::submitButton('<i class="bi bi-search"></i>', ['class' => 'btn']) ?>
                         </div>
+                        <?php ActiveForm::end(); ?>
                     </div>
                 </div>
                 <div class="table-responsive card-body p-0">
