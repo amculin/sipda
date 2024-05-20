@@ -112,7 +112,14 @@ $unit = $userData['kode'] . ' (' . $userData['unit_name'] . ')';
                             <a href="?page=profile" class="dropdown-item"><i class="bi bi-person me-2"></i> My Profile</a>
                             <a href="#" class="dropdown-item"><i class="bi bi-key me-2"></i> Change Password</a>
                             <div class="dropdown-divider"></div>
-                            <a href="logout.php" class="dropdown-item text-danger"><i class="bi bi-box-arrow-right me-2"></i> Logout</a>
+                            <?php
+                            echo Html::beginForm(['/site/logout']);
+                            echo Html::submitButton(
+                                '<i class="bi bi-box-arrow-right me-2"></i> Logout',
+                                ['class' => 'dropdown-item text-danger']
+                            );
+                            echo Html::endForm();
+                            ?>
                         </div>
                     </div>
                 </div>
