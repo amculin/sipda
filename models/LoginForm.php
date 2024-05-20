@@ -61,6 +61,14 @@ class LoginForm extends Model
     public function login()
     {
         if ($this->validate()) {
+            $sql = 'SELECT u.kode, u.nama AS unit_name, g.nama AS group_name FROM unit u, user_grup g WHERE u.id = :unit_id AND g.id = :group_id';
+            $data = Yii::$app->db->createCommand($sql, [
+                ':unit_id' => $this->getUser()->id_unit,
+                ':group_id' => $this->getUser()->id_grup
+            ])->queryOne();
+            $session = Yii::$app->session;
+            $session['user_data'] = $data;
+
             return Yii::$app->user->login($this->getUser(), $this->rememberMe ? 3600 : 0);
         }
 
