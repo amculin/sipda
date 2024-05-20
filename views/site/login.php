@@ -11,45 +11,45 @@ use yii\bootstrap5\Html;
 $this->title = 'Login';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="site-login">
-    <h1><?= Html::encode($this->title) ?></h1>
-
-    <p>Please fill out the following fields to login:</p>
-
-    <div class="row">
-        <div class="col-lg-5">
-
-            <?php $form = ActiveForm::begin([
-                'id' => 'login-form',
-                'fieldConfig' => [
-                    'template' => "{label}\n{input}\n{error}",
-                    'labelOptions' => ['class' => 'col-lg-1 col-form-label mr-lg-3'],
-                    'inputOptions' => ['class' => 'col-lg-3 form-control'],
-                    'errorOptions' => ['class' => 'col-lg-7 invalid-feedback'],
-                ],
-            ]); ?>
-
-            <?= $form->field($model, 'username')->textInput(['autofocus' => true]) ?>
-
-            <?= $form->field($model, 'password')->passwordInput() ?>
-
-            <?= $form->field($model, 'rememberMe')->checkbox([
-                'template' => "<div class=\"custom-control custom-checkbox\">{input} {label}</div>\n<div class=\"col-lg-8\">{error}</div>",
-            ]) ?>
-
-            <div class="form-group">
-                <div>
-                    <?= Html::submitButton('Login', ['class' => 'btn btn-primary', 'name' => 'login-button']) ?>
-                </div>
-            </div>
-
-            <?php ActiveForm::end(); ?>
-
-            <div style="color:#999;">
-                You may login with <strong>admin/admin</strong> or <strong>demo/demo</strong>.<br>
-                To modify the username/password, please check out the code <code>app\models\User::$users</code>.
-            </div>
-
-        </div>
+<div class="d-flex gap-3 mb-4 align-items-center">
+    <div class="logo">
+        <img src="image/logo_jmc_black.png" alt="" height="30" />
+    </div>
+    <div class="logo-text">
+        <h1 class="mb-0 text-primary"><?=Yii::$app->params['appName'];?></h1>
+        <div><?=Yii::$app->params['clientName'];?></div>
     </div>
 </div>
+<h2 class="fw-bold fs-1 text-primary mt-lg-5">LOGIN</h2>
+<p>
+    Selamat Datang, silahkan masukkan username dan password anda!
+</p>
+<?php $form = ActiveForm::begin([
+    'id' => 'login-form'
+]); ?>
+    <div class="mb-2">
+        <?= $form->field($model, 'username')->textInput([
+            'placeholder' => 'Username',
+            'class' => 'form-control py-3 border-0 bg-light text-dark'
+        ])->label(false) ?>
+    </div>
+    <div class="mb-2">
+        <?= $form->field($model, 'password')->passwordInput([
+            'placeholder' => 'Password',
+            'class' => 'form-control py-3 border-0 bg-light text-dark'
+        ])->label(false) ?>
+    </div>
+    <div class="mb-2">
+        <?= $form->field($model, 'unit')->dropDownList($unitList, [
+            'prompt' => 'Pilih Unit',
+            'class' => 'form-control py-3 border-0 bg-light text-dark',
+            'style' => 'color: #aaa!important'
+        ])->label(false); ?>
+    </div>
+    <div class="mb-2 text-end">
+        <a href="#" class="text-primary fw-bold" data-bs-toggle="modal" data-bs-target="#modal-forgot-password">Lupa Password?</a>
+    </div>
+    <div class="d-grid mt-4">
+        <button class="btn btn-primary text-uppercase shadow py-3" type="submit">Masuk</button>
+    </div>
+<?php ActiveForm::end(); ?>
