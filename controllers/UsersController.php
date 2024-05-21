@@ -66,6 +66,7 @@ class UsersController extends Controller
     public function actionCreate()
     {
         $model = new User();
+        $model->scenario = $model::SCENARIO_NEW_USER;
 
         if (Yii::$app->request->isAjax) {
             if ($model->load(Yii::$app->request->post())) {
@@ -97,7 +98,8 @@ class UsersController extends Controller
 
     /**
      * Updates an existing User model.
-     * If update is successful, the browser will be redirected to the 'view' page.
+     * If request comes in AJAX, it will render the form or do the validation.
+     * If update is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
@@ -105,19 +107,44 @@ class UsersController extends Controller
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $tempPassword = $model->password;
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                if ($model->password == '') {
+                    $model->password = $tempPassword;
+                }
+
+                Yii::$app->response->format = Response::FORMAT_JSON;
+    
+                return ActiveForm::validate($model);
+            } else {
+                $roleList = UserGrupSearch::getList();
+                $unitList = UnitSearch::getList();
+                $model->password = '';
+
+                return $this->renderAjax('_form', [
+                    'model' => $model,
+                    'title' => 'Edit User',
+                    'roleList' => $roleList,
+                    'unitList' => $unitList
+                ]);
+            }
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            $model->password = $model->password == '' ? $tempPassword :
+                Yii::$app->getSecurity()->generatePasswordHash($model->password);
+            
+            if ($model->save()) {
+                return $this->redirect(['index']);
+            }
+        }
     }
 
     /**
      * Deletes an existing User model.
-     * If deletion is successful, the browser will return success message.
+     * If deletion is successful, the system will return success message.
      * @param int $id ID
      * @return \yii\web\Response
      * @throws UnprocessableEntityHttpException if the action cannot be executed
@@ -153,7 +180,7 @@ class UsersController extends Controller
 
     /**
      * Lock/unlock an existing User model.
-     * If lock/unlock is successful, the browser will return success message.
+     * If lock/unlock is successful, the system will return success message.
      * @param int $id ID
      * @return \yii\web\Response
      * @throws UnprocessableEntityHttpException if the action cannot be executed

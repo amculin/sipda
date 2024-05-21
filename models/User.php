@@ -35,6 +35,7 @@ class User extends \yii\db\ActiveRecord
 {
     const IS_DISABLED = 1;
     const IS_NOT_DISABLED = 0;
+    const SCENARIO_NEW_USER = 'new-user';
 
     /**
      * {@inheritdoc}
@@ -50,9 +51,10 @@ class User extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_unit', 'id_grup', 'username', 'password', 'nama', 'email'], 'required'],
+            [['id_unit', 'id_grup', 'username', 'nama', 'email'], 'required'],
+            [['password'], 'required', 'on' => $this::SCENARIO_NEW_USER],
             [['id_unit', 'id_grup', 'komisi_jabatan', 'is_disabled'], 'integer'],
-            [['last_login', 'timestamp'], 'safe'],
+            [['password', 'last_login', 'timestamp'], 'safe'],
             [['username', 'password'], 'string', 'max' => 64],
             [['auth_key', 'nama', 'email', 'jabatan'], 'string', 'max' => 128],
             [['username', 'email'], 'unique'],
@@ -173,7 +175,9 @@ class User extends \yii\db\ActiveRecord
             return false;
         }
 
-        $this->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
+        if ($insert) {
+            $this->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
+        }
 
         return true;
     }

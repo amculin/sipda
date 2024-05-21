@@ -51,7 +51,6 @@ use yii\widgets\ActiveForm;
 
 <?php
 $js = "
-$('.sales').hide();
 $('#user-id_grup').change(function() {
     var value = $(this).val();
 
@@ -62,6 +61,12 @@ $('#user-id_grup').change(function() {
     }
 });
 ";
+
+if ($model->id_grup == 2) {
+    $js .= "$('.sales').show();";
+} else {
+    $js .= "$('.sales').hide();";
+}
 
 $this->registerJs($js, $this::POS_END, 'sales-form-handler');
 ?>
