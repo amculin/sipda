@@ -153,8 +153,13 @@ class UsersController extends Controller
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        if ($this->findModel($id)->delete() === false)
+        $model = $this->findModel($id);
+        $model->scenario = $model::SCENARIO_SOFT_DELETION;
+        $model->is_deleted = $model::IS_DELETED;
+
+        if (! $model->save()) {
             throw new yii\web\UnprocessableEntityHttpException('Gagal');
+        }
 
         return [
             'code' => 200,

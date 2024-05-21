@@ -14,6 +14,7 @@ use app\models\User;
  * @property int $bulan
  * @property float $target_penjualan
  * @property float $target_komisi
+ * @property int $is_deleted
  *
  * @property User $sales
  */
@@ -34,7 +35,7 @@ class Plan extends \yii\db\ActiveRecord
     {
         return [
             [['id_sales', 'tahun', 'bulan'], 'required'],
-            [['id_sales', 'tahun', 'bulan'], 'integer'],
+            [['id_sales', 'tahun', 'bulan', 'is_deleted'], 'integer'],
             [['target_penjualan', 'target_komisi'], 'number'],
             [['id_sales'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['id_sales' => 'id']],
         ];
@@ -52,6 +53,7 @@ class Plan extends \yii\db\ActiveRecord
             'bulan' => 'Bulan',
             'target_penjualan' => 'Target Penjualan',
             'target_komisi' => 'Target Komisi',
+            'is_deleted' => 'Is Deleted',
         ];
     }
 

@@ -19,6 +19,7 @@ use app\modules\sales\models\Plan;
  * @property string|null $jabatan
  * @property int $komisi_jabatan
  * @property int $is_disabled
+ * @property int $is_deleted
  * @property string|null $last_login
  * @property string $timestamp
  *
@@ -35,7 +36,11 @@ class User extends \yii\db\ActiveRecord
 {
     const IS_DISABLED = 1;
     const IS_NOT_DISABLED = 0;
+    const IS_DELETED = 1;
+    const IS_NOT_DELETED = 0;
+
     const SCENARIO_NEW_USER = 'new-user';
+    const SCENARIO_SOFT_DELETION = 'soft_deletion';
 
     /**
      * {@inheritdoc}
@@ -53,7 +58,8 @@ class User extends \yii\db\ActiveRecord
         return [
             [['id_unit', 'id_grup', 'username', 'nama', 'email'], 'required'],
             [['password'], 'required', 'on' => $this::SCENARIO_NEW_USER],
-            [['id_unit', 'id_grup', 'komisi_jabatan', 'is_disabled'], 'integer'],
+            [['is_deleted'], 'required', 'on' => $this::SCENARIO_SOFT_DELETION],
+            [['id_unit', 'id_grup', 'komisi_jabatan', 'is_disabled', 'is_deleted'], 'integer'],
             [['password', 'last_login', 'timestamp'], 'safe'],
             [['username', 'password'], 'string', 'max' => 64],
             [['auth_key', 'nama', 'email', 'jabatan'], 'string', 'max' => 128],
@@ -81,6 +87,7 @@ class User extends \yii\db\ActiveRecord
             'jabatan' => 'Jabatan',
             'komisi_jabatan' => 'Komisi Jabatan',
             'is_disabled' => 'Is Disabled',
+            'is_deleted' => 'Is Deleted',
             'last_login' => 'Last Login',
             'timestamp' => 'Timestamp',
         ];
@@ -195,6 +202,13 @@ class User extends \yii\db\ActiveRecord
                     $plan->target_komisi = 0;
                     $plan->save();
                 }
+            }
+        } else {
+            if ($this->scenario == $this::SCENARIO_SOFT_DELETION) {
+                Yii::$app->db->createCommand('UPDATE plan SET is_deleted = :status WHERE id_sales = :user_id', [
+                    ':status' => $this::IS_DELETED,
+                    ':user_id' => $this->id
+                ])->execute();
             }
         }
     }

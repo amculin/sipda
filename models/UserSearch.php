@@ -42,7 +42,8 @@ class UserSearch extends User
     public function search($params)
     {
         $filters = [];
-        $bound = [];
+        $bound = [':status' => $this::IS_NOT_DELETED];
+        $where = ' WHERE u.is_deleted = :status';
 
         $this->load($params);
 
@@ -57,9 +58,7 @@ class UserSearch extends User
         }
 
         if (count($filters) > 0) {
-            $where = ' WHERE ' . implode(' AND ', $filters);
-        } else {
-            $where = '';
+            $where .= ' AND ' . implode(' AND ', $filters);
         }
 
         $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM user u' . $where, $bound)->queryScalar();
