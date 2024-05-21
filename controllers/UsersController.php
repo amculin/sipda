@@ -111,16 +111,22 @@ class UsersController extends Controller
 
     /**
      * Deletes an existing User model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * If deletion is successful, the browser will return success message.
      * @param int $id ID
      * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
+     * @throws UnprocessableEntityHttpException if the action cannot be executed
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        return $this->redirect(['index']);
+        if ($this->findModel($id)->delete() === false)
+            throw new yii\web\UnprocessableEntityHttpException('Gagal');
+
+        return [
+            'code' => 200,
+            'message' => 'Sukses'
+        ];
     }
 
     /**
@@ -139,6 +145,13 @@ class UsersController extends Controller
         throw new NotFoundHttpException('The requested page does not exist.');
     }
 
+    /**
+     * Lock/unlock an existing User model.
+     * If lock/unlock is successful, the browser will return success message.
+     * @param int $id ID
+     * @return \yii\web\Response
+     * @throws UnprocessableEntityHttpException if the action cannot be executed
+     */
     public function actionLock($id)
     {
         Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
