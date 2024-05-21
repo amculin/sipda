@@ -63,7 +63,7 @@ class UserSearch extends User
         }
 
         $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM user u' . $where, $bound)->queryScalar();
-        $sql = "SELECT u.id, u.id_grup, u.username, u.nama, u.email, u.jabatan, ug.nama AS role  FROM user u
+        $sql = "SELECT u.id, u.id_grup, u.username, u.nama, u.email, u.jabatan, u.is_disabled, ug.nama AS role  FROM user u
         LEFT JOIN user_grup ug ON (ug.id = u.id_grup)
         {$where}";
 

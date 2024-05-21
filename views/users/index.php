@@ -12,7 +12,7 @@ $this->title = 'Provinces';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
-<div class="page-wrapper" data-menu-active="Referensi" data-submenu-active="Provinsi">
+<div class="page-wrapper" data-menu-active="Manajemen User" data-submenu-active="">
     <div class="container-xl">
         <!-- Page title -->
         <div class="page-header d-print-none">
@@ -83,13 +83,13 @@ $this->params['breadcrumbs'][] = $this->title;
                                 'buttons' => [
                                     'lock' => function ($url, $model, $key) {
                                         $icon = Html::tag('i', '', [
-                                            'class' => "bi bi-lock",
+                                            'class' => $model['is_disabled'] == 1 ? 'bi bi-unlock' : 'bi bi-lock',
                                             'data-bs-toggle' => 'tooltip',
                                             'data-bs-placement' => 'bottom',
-                                            'title' => 'Lock'
+                                            'title' => $model['is_disabled'] == 1 ? 'Unlock' : 'Lock'
                                         ]);
                         
-                                        return Html::a($icon, $url, ['class' => 'text-dark']);
+                                        return Html::a($icon, $url, ['class' => 'text-dark lock-user']);
                                     }
                                 ],
                                 'visibleButtons' => [
@@ -135,4 +135,51 @@ $this->params['breadcrumbs'][] = $this->title;
 
 <?php
 FormModalAsset::register($this);
+
+$js = "
+$('#w1 a.lock-user').click(function(event) {
+    event.preventDefault();
+    
+    var url = $(this).attr('href');
+    var action = ($(this).find('i').attr('data-bs-original-title') == 'Lock') ? 'Kunci' : 'Buka Kunci';
+    var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
+
+    Swal.fire({
+        title: action + ' User?',
+        text: 'Apakah anda yakin?',
+        icon: 'warning',
+        showCancelButton: true,
+        reverseButtons:true,
+        confirmButtonText: 'Ya, ' + action + ' User!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url : url,
+                type : 'POST',
+                data: {_csrf : csrfToken},
+                success : function(data){
+                    if (data.code == 200) {
+                        var title = 'Sukses!';
+                        var message = 'User Berhasil Di' + action.toLowerCase();
+                        var icon = 'success';
+                    } else {
+                        var title = 'Gagal!';
+                        var message = 'Data Gagal Di' + action.toLowerCase();
+                        var icon = 'error';
+                    }
+                    Swal.fire(
+                        title,
+                        message,
+                        icon
+                    ).then((result) => {
+                        location.reload();
+                    });
+                }
+            });
+        }
+    })
+});
+";
+
+$this->registerJs($js, $this::POS_END, 'user-lock-handler');
 ?>

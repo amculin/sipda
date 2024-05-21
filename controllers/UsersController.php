@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use Yii;
 use app\models\User;
 use app\models\UserGrupSearch;
 use app\models\UserSearch;
@@ -14,6 +15,8 @@ use yii\filters\VerbFilter;
  */
 class UsersController extends Controller
 {
+    public $enableCsrfValidation = true;
+
     /**
      * @inheritDoc
      */
@@ -26,6 +29,7 @@ class UsersController extends Controller
                     'class' => VerbFilter::className(),
                     'actions' => [
                         'delete' => ['POST'],
+                        'lock' => ['POST']
                     ],
                 ],
             ]
@@ -133,5 +137,27 @@ class UsersController extends Controller
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
+    }
+
+    public function actionLock($id)
+    {
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+        $model = $this->findModel($id);
+
+        if ($model->is_disabled == $model::IS_DISABLED) {
+            $model->is_disabled = $model::IS_NOT_DISABLED;
+        } else {
+            $model->is_disabled = $model::IS_DISABLED;
+        }
+
+        if (! $model->save()) {
+            throw new yii\web\UnprocessableEntityHttpException('Gagal');
+        }
+
+        return [
+            'code' => 200,
+            'message' => 'Sukses'
+        ];
     }
 }
