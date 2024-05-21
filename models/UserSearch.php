@@ -58,7 +58,7 @@ class UserSearch extends User
         }
 
         if (count($filters) > 0) {
-            $where .= ' AND ' . implode(' AND ', $filters);
+            $where .= ' AND (' . implode(' AND ', $filters) . ')';
         }
 
         $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM user u' . $where, $bound)->queryScalar();
