@@ -3,12 +3,15 @@
 namespace app\controllers;
 
 use Yii;
+use app\models\UnitSearch;
 use app\models\User;
 use app\models\UserGrupSearch;
 use app\models\UserSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\widgets\ActiveForm;
 use yii\filters\VerbFilter;
+use yii\web\Response;
 
 /**
  * UsersController implements the CRUD actions for User model.
@@ -55,38 +58,41 @@ class UsersController extends Controller
     }
 
     /**
-     * Displays a single User model.
-     * @param int $id ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
      * Creates a new User model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
+     * If request comes in AJAX, it will render the form or do the validation.
+     * If creation is successful, the browser will be redirected to the 'index' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
         $model = new User();
 
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+    
+                return ActiveForm::validate($model);
+            } else {
+                $roleList = UserGrupSearch::getList();
+                $unitList = UnitSearch::getList();
+                $model->komisi_jabatan = 0;
+
+                return $this->renderAjax('_form', [
+                    'model' => $model,
+                    'title' => 'Tambah User',
+                    'roleList' => $roleList,
+                    'unitList' => $unitList
+                ]);
+            }
+        }
+
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['index']);
             }
         } else {
             $model->loadDefaultValues();
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
     /**

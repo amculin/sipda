@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\modules\sales\models\Plan;
 
 /**
  * This is the model class for table "user".
@@ -54,7 +55,8 @@ class User extends \yii\db\ActiveRecord
             [['last_login', 'timestamp'], 'safe'],
             [['username', 'password'], 'string', 'max' => 64],
             [['auth_key', 'nama', 'email', 'jabatan'], 'string', 'max' => 128],
-            [['username'], 'unique'],
+            [['username', 'email'], 'unique'],
+            [['email'], 'email'],
             [['id_unit'], 'exist', 'skipOnError' => true, 'targetClass' => Unit::class, 'targetAttribute' => ['id_unit' => 'id']],
             [['id_grup'], 'exist', 'skipOnError' => true, 'targetClass' => UserGrup::class, 'targetAttribute' => ['id_grup' => 'id']],
         ];
@@ -67,8 +69,8 @@ class User extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'id_unit' => 'ID Unit',
-            'id_grup' => 'ID Grup',
+            'id_unit' => 'Unit',
+            'id_grup' => 'Role',
             'username' => 'Username',
             'password' => 'Password',
             'auth_key' => 'Auth Key',
@@ -160,5 +162,36 @@ class User extends \yii\db\ActiveRecord
     public function getUnit()
     {
         return $this->hasOne(Unit::class, ['id' => 'id_unit']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeSave($insert)
+    {
+        if (!parent::beforeSave($insert)) {
+            return false;
+        }
+
+        $this->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
+
+        return true;
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert) {
+            if ($this->id_grup != 1) {
+                for ($i = 1; $i <= 12; $i++) {
+                    $plan = new Plan();
+                    $plan->id_sales = $this->id;
+                    $plan->tahun = date('Y');
+                    $plan->bulan = $i;
+                    $plan->target_penjualan = 0;
+                    $plan->target_komisi = 0;
+                    $plan->save();
+                }
+            }
+        }
     }
 }
