@@ -7,10 +7,11 @@ use app\models\UnitSearch;
 use app\models\User;
 use app\models\UserGrupSearch;
 use app\models\UserSearch;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\widgets\ActiveForm;
-use yii\filters\VerbFilter;
 use yii\web\Response;
 
 /**
@@ -28,6 +29,21 @@ class UsersController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+                'access' => [
+                    'class' => AccessControl::class,
+                    'rules' => [
+                        [
+                            'allow' => true,
+                            'matchCallback' => function ($rule, $action) {
+                                if (Yii::$app->user->isGuest) {
+                                    return false;
+                                } else {
+                                    return Yii::$app->user->identity->id_grup === 1;
+                                }
+                            }
+                        ],
+                    ],
+                ],
                 'verbs' => [
                     'class' => VerbFilter::className(),
                     'actions' => [
