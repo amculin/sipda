@@ -29,6 +29,7 @@ $unit = $userData['kode'] . ' (' . $userData['unit_name'] . ')';
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <?= Html::csrfMetaTags() ?>
         <title><?= Html::encode(Yii::$app->params['appName']); ?></title>
         <!-- <link rel="shortcut icon" href="static/client-logo.png"> -->
         <!-- CSS files -->

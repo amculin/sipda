@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\modules\sales\models\Plan;
 
 /**
  * This is the model class for table "user".
@@ -18,6 +19,7 @@ use Yii;
  * @property string|null $jabatan
  * @property int $komisi_jabatan
  * @property int $is_disabled
+ * @property int $is_deleted
  * @property string|null $last_login
  * @property string $timestamp
  *
@@ -34,6 +36,11 @@ class User extends \yii\db\ActiveRecord
 {
     const IS_DISABLED = 1;
     const IS_NOT_DISABLED = 0;
+    const IS_DELETED = 1;
+    const IS_NOT_DELETED = 0;
+
+    const SCENARIO_NEW_USER = 'new-user';
+    const SCENARIO_SOFT_DELETION = 'soft_deletion';
 
     /**
      * {@inheritdoc}
@@ -49,12 +56,15 @@ class User extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_unit', 'id_grup', 'username', 'password', 'nama', 'email'], 'required'],
-            [['id_unit', 'id_grup', 'komisi_jabatan', 'is_disabled'], 'integer'],
-            [['last_login', 'timestamp'], 'safe'],
+            [['id_unit', 'id_grup', 'username', 'nama', 'email'], 'required'],
+            [['password'], 'required', 'on' => $this::SCENARIO_NEW_USER],
+            [['is_deleted'], 'required', 'on' => $this::SCENARIO_SOFT_DELETION],
+            [['id_unit', 'id_grup', 'komisi_jabatan', 'is_disabled', 'is_deleted'], 'integer'],
+            [['password', 'last_login', 'timestamp'], 'safe'],
             [['username', 'password'], 'string', 'max' => 64],
             [['auth_key', 'nama', 'email', 'jabatan'], 'string', 'max' => 128],
-            [['username'], 'unique'],
+            [['username', 'email'], 'unique'],
+            [['email'], 'email'],
             [['id_unit'], 'exist', 'skipOnError' => true, 'targetClass' => Unit::class, 'targetAttribute' => ['id_unit' => 'id']],
             [['id_grup'], 'exist', 'skipOnError' => true, 'targetClass' => UserGrup::class, 'targetAttribute' => ['id_grup' => 'id']],
         ];
@@ -67,8 +77,8 @@ class User extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'id_unit' => 'ID Unit',
-            'id_grup' => 'ID Grup',
+            'id_unit' => 'Unit',
+            'id_grup' => 'Role',
             'username' => 'Username',
             'password' => 'Password',
             'auth_key' => 'Auth Key',
@@ -77,6 +87,7 @@ class User extends \yii\db\ActiveRecord
             'jabatan' => 'Jabatan',
             'komisi_jabatan' => 'Komisi Jabatan',
             'is_disabled' => 'Is Disabled',
+            'is_deleted' => 'Is Deleted',
             'last_login' => 'Last Login',
             'timestamp' => 'Timestamp',
         ];
@@ -160,5 +171,45 @@ class User extends \yii\db\ActiveRecord
     public function getUnit()
     {
         return $this->hasOne(Unit::class, ['id' => 'id_unit']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeSave($insert)
+    {
+        if (!parent::beforeSave($insert)) {
+            return false;
+        }
+
+        if ($insert) {
+            $this->password = Yii::$app->getSecurity()->generatePasswordHash($this->password);
+        }
+
+        return true;
+    }
+
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert) {
+            if ($this->id_grup != 1) {
+                for ($i = 1; $i <= 12; $i++) {
+                    $plan = new Plan();
+                    $plan->id_sales = $this->id;
+                    $plan->tahun = date('Y');
+                    $plan->bulan = $i;
+                    $plan->target_penjualan = 0;
+                    $plan->target_komisi = 0;
+                    $plan->save();
+                }
+            }
+        } else {
+            if ($this->scenario == $this::SCENARIO_SOFT_DELETION) {
+                Yii::$app->db->createCommand('UPDATE plan SET is_deleted = :status WHERE id_sales = :user_id', [
+                    ':status' => $this::IS_DELETED,
+                    ':user_id' => $this->id
+                ])->execute();
+            }
+        }
     }
 }
