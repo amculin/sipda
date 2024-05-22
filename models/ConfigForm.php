@@ -4,6 +4,7 @@ namespace app\models;
 
 use Yii;
 use yii\base\Model;
+use yii\helpers\Json;
 
 /**
  * ConfigForm is the model behind the configuration form.
@@ -82,11 +83,11 @@ class ConfigForm extends Model
             if (is_null($this->configID)) {
                 Yii::$app->db->createCommand()->insert('config', [
                     'id_unit' => Yii::$app->user->identity->id_unit,
-                    'config' => json_encode($this->attributes)
+                    'config' => Json::encode($this->attributes)
                 ])->execute();
             } else {
                 Yii::$app->db->createCommand()->update('config', [
-                    'config' => json_encode($this->attributes)
+                    'config' => Json::encode($this->attributes)
                 ], 'id_unit = :unit_id', [
                     ':unit_id' => Yii::$app->user->identity->id_unit
                 ])->execute();
@@ -121,7 +122,7 @@ class ConfigForm extends Model
             ]);
         } else {
             $this->scenario = $this::SCENARIO_UPDATE_EXISTING;
-            $data = json_decode(json_decode($configData['config'], true), true);
+            $data = Json::decode($configData['config'], true);
             $this->attributes = ($data);
             $this->configID = $configData['id'];
         }
