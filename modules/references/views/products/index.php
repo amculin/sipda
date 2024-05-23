@@ -35,7 +35,7 @@ use yii\widgets\ActiveForm;
         <div class="container-xl">
             <div class="card">
                 <div class="card-header">
-                    <a href="<?= Url::to('/references/categories/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block modal-trigger"
+                    <a href="<?= Url::to('/references/products/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block modal-trigger"
                         data-bs-toggle="modal" data-bs-target="#modal-form">
                         <i class="bi bi-plus"></i>
                         Tambah Data
@@ -96,23 +96,26 @@ use yii\widgets\ActiveForm;
                             [
                                 'header' => 'Harga Pokok',
                                 'value' => function ($data) {
-                                    return "Rp " . number_format($data['harga_pokok'], 2, ",", ".");
+                                    return number_format($data['harga_pokok'], 0, ",", ".");
                                 },
-                                'headerOptions' => ['width' => '140']
+                                'headerOptions' => ['width' => '140', 'class' => 'text-end'],
+                                'contentOptions' => ['class' => 'text-end']
                             ],
                             [
                                 'header' => 'Harga Jual',
                                 'value' => function ($data) {
-                                    return "Rp " . number_format($data['harga_jual'], 2, ",", ".");
+                                    return number_format($data['harga_jual'], 0, ",", ".");
                                 },
-                                'headerOptions' => ['width' => '140']
+                                'headerOptions' => ['width' => '140', 'class' => 'text-end'],
+                                'contentOptions' => ['class' => 'text-end']
                             ],
                             [
                                 'header' => 'Jumlah Stock',
                                 'value' => function ($data) {
                                     return $data['jumlah_stock'];
                                 },
-                                'headerOptions' => ['width' => '60']
+                                'headerOptions' => ['width' => '60', 'class' => 'text-end'],
+                                'contentOptions' => ['class' => 'text-end']
                             ],
                         ],
                         'pager' => [
