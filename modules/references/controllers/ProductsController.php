@@ -105,7 +105,8 @@ class ProductsController extends Controller
 
     /**
      * Updates an existing Produk model.
-     * If update is successful, the browser will be redirected to the 'view' page.
+     * If request comes in AJAX, it will render the form or do the validation.
+     * If update is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
@@ -114,13 +115,25 @@ class ProductsController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+    
+                return ActiveForm::validate($model);
+            } else {
+                $categoryList = KategoriSearch::getList();
+
+                return $this->renderAjax('_form', [
+                    'model' => $model,
+                    'title' => 'Edit Produk',
+                    'categoryList' => $categoryList
+                ]);
+            }
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
     }
 
     /**
