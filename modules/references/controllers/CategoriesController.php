@@ -94,13 +94,22 @@ class CategoriesController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+    
+                return ActiveForm::validate($model);
+            } else {
+                return $this->renderAjax('_form', [
+                    'model' => $model,
+                    'title' => 'Edit Kategori'
+                ]);
+            }
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
     }
 
     /**
