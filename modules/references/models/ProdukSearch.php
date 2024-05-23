@@ -5,12 +5,12 @@ namespace app\modules\references\models;
 use Yii;
 use yii\base\Model;
 use yii\data\SqlDataProvider;
-use yii\helpers\ArrayHelper;
+use app\modules\references\models\Produk;
 
 /**
- * KategoriSearch represents the model behind the search form of `app\modules\references\models\Kategori`.
+ * ProdukSearch represents the model behind the search form of `app\modules\references\models\Produk`.
  */
-class KategoriSearch extends Kategori
+class ProdukSearch extends Produk
 {
     /**
      * {@inheritdoc}
@@ -18,8 +18,9 @@ class KategoriSearch extends Kategori
     public function rules()
     {
         return [
-            [['id', 'id_unit', 'is_deleted'], 'integer'],
-            [['nama'], 'safe'],
+            [['id', 'id_kategori', 'jumlah_stock', 'prosentase_komisi', 'is_deleted'], 'integer'],
+            [['kode', 'nama'], 'safe'],
+            [['harga_pokok', 'harga_jual', 'nominal_komisi'], 'number'],
         ];
     }
 
@@ -45,17 +46,18 @@ class KategoriSearch extends Kategori
             ':unitID' => Yii::$app->user->identity->id_unit,
             ':status' => $this::IS_NOT_DELETED
         ];
-        $where = ' WHERE k.id_unit = :unitID AND k.is_deleted = :status';
+        $where = ' WHERE p.id_unit = :unitID AND p.is_deleted = :status';
 
         $this->load($params);
 
         if ($this->nama) {
-            $where .= ' AND k.nama LIKE :name';
+            $where .= ' AND p.nama LIKE :name';
             $bound[':name'] = "%{$this->nama}%";
         }
 
-        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM kategori k' . $where, $bound)->queryScalar();
-        $sql = "SELECT k.id, k.nama FROM kategori k
+        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM kategori p' . $where, $bound)->queryScalar();
+        $sql = "SELECT p.id, p.kode, p.nama, p.harga_pokok, p.harga_jual, p.jumlah_stock, k.nama AS `category` FROM produk p
+                LEFT JOIN kategori k ON (k.id = p.id_kategori)
         {$where}";
 
         $config = [
@@ -70,17 +72,5 @@ class KategoriSearch extends Kategori
         $provider = new SqlDataProvider($config);
 
         return $provider;
-    }
-
-    public static function getList()
-    {
-        $sql = "SELECT id, nama FROM kategori WHERE id_unit = :unitID AND is_deleted = :status ORDER BY nama ASC";
-
-        $data = Yii::$app->db->createCommand($sql, [
-            ':unitID' => Yii::$app->user->identity->id_unit,
-            ':status' => parent::IS_NOT_DELETED
-        ])->queryAll();
-
-        return ArrayHelper::map($data, 'id', 'nama');
     }
 }
