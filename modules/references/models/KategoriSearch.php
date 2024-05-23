@@ -63,7 +63,7 @@ class KategoriSearch extends Kategori
             'params' => $bound,
             'totalCount' => $count,
             'pagination' => [
-                'pageSize' => 2,
+                'pageSize' => 15,
             ],
         ];
 
