@@ -52,6 +52,7 @@ class CategoriesController extends Controller
 
     /**
      * Creates a new Kategori model.
+     * If request comes in AJAX, it will render the form or do the validation.
      * If creation is successful, the browser will be redirected to the 'index' page.
      * @return string|\yii\web\Response
      */
@@ -85,7 +86,8 @@ class CategoriesController extends Controller
 
     /**
      * Updates an existing Kategori model.
-     * If update is successful, the browser will be redirected to the 'view' page.
+     * If request comes in AJAX, it will render the form or do the validation.
+     * If update is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
@@ -114,16 +116,26 @@ class CategoriesController extends Controller
 
     /**
      * Deletes an existing Kategori model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
+     * If deletion is successful, the system will return success message.
      * @param int $id ID
      * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
+     * @throws UnprocessableEntityHttpException if the model cannot be found
      */
     public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
+    {        
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        return $this->redirect(['index']);
+        $model = $this->findModel($id);
+        $model->is_deleted = $model::IS_DELETED;
+
+        if (! $model->save()) {
+            throw new yii\web\UnprocessableEntityHttpException('Gagal');
+        }
+
+        return [
+            'code' => 200,
+            'message' => 'Sukses'
+        ];
     }
 
     /**
