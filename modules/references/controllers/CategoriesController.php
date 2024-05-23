@@ -5,11 +5,12 @@ namespace app\modules\references\controllers;
 use Yii;
 use app\modules\references\models\Kategori;
 use app\modules\references\models\KategoriSearch;
+use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
-use yii\filters\VerbFilter;
 
 /**
  * CategoriesController implements the CRUD actions for Kategori model.
@@ -24,6 +25,21 @@ class CategoriesController extends Controller
         return array_merge(
             parent::behaviors(),
             [
+                'access' => [
+                    'class' => AccessControl::class,
+                    'rules' => [
+                        [
+                            'allow' => true,
+                            'matchCallback' => function ($rule, $action) {
+                                if (Yii::$app->user->isGuest) {
+                                    return false;
+                                } else {
+                                    return Yii::$app->user->identity->id_grup === 1;
+                                }
+                            }
+                        ],
+                    ],
+                ],
                 'verbs' => [
                     'class' => VerbFilter::className(),
                     'actions' => [
