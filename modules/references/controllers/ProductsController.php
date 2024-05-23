@@ -145,9 +145,19 @@ class ProductsController extends Controller
      */
     public function actionDelete($id)
     {
-        $this->findModel($id)->delete();
+        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
-        return $this->redirect(['index']);
+        $model = $this->findModel($id);
+        $model->is_deleted = $model::IS_DELETED;
+
+        if (! $model->save()) {
+            throw new yii\web\UnprocessableEntityHttpException('Gagal');
+        }
+
+        return [
+            'code' => 200,
+            'message' => 'Sukses'
+        ];
     }
 
     /**
