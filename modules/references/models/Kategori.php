@@ -74,4 +74,15 @@ class Kategori extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Unit::class, ['id' => 'id_unit']);
     }
+
+    public function beforeValidate()
+    {
+        parent::beforeValidate();
+
+        if ($this->isNewRecord) {
+            $this->id_unit = Yii::$app->user->identity->id_unit;
+        }
+
+        return true;
+    }
 }
