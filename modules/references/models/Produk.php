@@ -98,4 +98,15 @@ class Produk extends \yii\db\ActiveRecord
     {
         return $this->hasMany(SoDetail::class, ['id_produk' => 'id']);
     }
+
+    public function beforeValidate()
+    {
+        parent::beforeValidate();
+
+        if ($this->isNewRecord) {
+            $this->id_unit = Yii::$app->user->identity->id_unit;
+        }
+
+        return true;
+    }
 }

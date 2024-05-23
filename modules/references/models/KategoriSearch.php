@@ -5,7 +5,7 @@ namespace app\modules\references\models;
 use Yii;
 use yii\base\Model;
 use yii\data\SqlDataProvider;
-use app\modules\references\models\Kategori;
+use yii\helpers\ArrayHelper;
 
 /**
  * KategoriSearch represents the model behind the search form of `app\modules\references\models\Kategori`.
@@ -70,5 +70,17 @@ class KategoriSearch extends Kategori
         $provider = new SqlDataProvider($config);
 
         return $provider;
+    }
+
+    public static function getList()
+    {
+        $sql = "SELECT id, nama FROM kategori WHERE id_unit = :unitID AND is_deleted = :status ORDER BY nama ASC";
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':unitID' => Yii::$app->user->identity->id_unit,
+            ':status' => parent::IS_NOT_DELETED
+        ])->queryAll();
+
+        return ArrayHelper::map($data, 'id', 'nama');
     }
 }
