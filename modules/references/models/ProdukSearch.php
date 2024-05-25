@@ -55,7 +55,7 @@ class ProdukSearch extends Produk
             $bound[':name'] = "%{$this->nama}%";
         }
 
-        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM kategori p' . $where, $bound)->queryScalar();
+        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM produk p' . $where, $bound)->queryScalar();
         $sql = "SELECT p.id, p.kode, p.nama, p.harga_pokok, p.harga_jual, p.jumlah_stock, k.nama AS `category` FROM produk p
                 LEFT JOIN kategori k ON (k.id = p.id_kategori)
         {$where}";
@@ -65,7 +65,7 @@ class ProdukSearch extends Produk
             'params' => $bound,
             'totalCount' => $count,
             'pagination' => [
-                'pageSize' => 15,
+                'pageSize' => 15
             ],
         ];
 

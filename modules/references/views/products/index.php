@@ -122,7 +122,7 @@ use yii\widgets\ActiveForm;
                             'class' => 'app\customs\FLinkPager',
                             'options' => ['class' => 'pagination ms-auto m-0'],
                             'linkContainerOptions' => ['class' => 'page-item'],
-                            'linkOptions' => ['class' => 'page-link'],
+                            'linkOptions' => ['class' => 'page-link']
                         ]
                     ]); ?>
                 </div>
