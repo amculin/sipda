@@ -37,7 +37,7 @@ use yii\widgets\ActiveForm;
         <div class="container-xl">
             <div class="card">
                 <div class="card-header">
-                    <a href="<?= Url::to('/references/tahapan/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block modal-trigger"
+                    <a href="<?= Url::to('/references/steps/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block modal-trigger"
                         data-bs-toggle="modal" data-bs-target="#modal-form">
                         <i class="bi bi-plus"></i>
                         Tambah Data

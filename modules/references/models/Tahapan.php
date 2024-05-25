@@ -3,6 +3,7 @@
 namespace app\modules\references\models;
 
 use Yii;
+use app\models\Unit;
 
 /**
  * This is the model class for table "tahapan".
@@ -54,8 +55,8 @@ class Tahapan extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'id_unit' => 'Id Unit',
-            'nama' => 'Nama',
-            'urutan' => 'Urutan',
+            'nama' => 'Nama Tahapan',
+            'urutan' => 'Nomor Urut',
             'warna' => 'Warna',
         ];
     }
@@ -108,5 +109,16 @@ class Tahapan extends \yii\db\ActiveRecord
     public function getUnit()
     {
         return $this->hasOne(Unit::class, ['id' => 'id_unit']);
+    }
+
+    public function beforeValidate()
+    {
+        parent::beforeValidate();
+
+        if ($this->isNewRecord) {
+            $this->id_unit = Yii::$app->user->identity->id_unit;
+        }
+
+        return true;
     }
 }

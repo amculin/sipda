@@ -9,6 +9,8 @@ use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 /**
  * StepsController implements the CRUD actions for Tahapan model.
@@ -65,38 +67,37 @@ class StepsController extends Controller
     }
 
     /**
-     * Displays a single Tahapan model.
-     * @param int $id ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
      * Creates a new Tahapan model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
+     * If request comes in AJAX, it will render the form or do the validation.
+     * If creation is successful, the browser will be redirected to the 'index' page.
      * @return string|\yii\web\Response
      */
     public function actionCreate()
     {
         $model = new Tahapan();
 
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+    
+                return ActiveForm::validate($model);
+            } else {
+                return $this->renderAjax('_form', [
+                    'model' => $model,
+                    'title' => 'Tambah Tahapan'
+                ]);
+            }
+        }
+
         if ($this->request->isPost) {
             if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
+                return $this->redirect(['index']);
+            } else {
+                print_r($model->getErrors());
             }
         } else {
             $model->loadDefaultValues();
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
     }
 
     /**
