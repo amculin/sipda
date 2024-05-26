@@ -71,7 +71,7 @@ class UserSearch extends User
             'params' => $bound,
             'totalCount' => $count,
             'pagination' => [
-                'pageSize' => 15,
+                'pageSize' => Yii::$app->params['pageSize'],
             ],
         ];
 
