@@ -14,6 +14,9 @@ use Yii;
  */
 class UserGrup extends \yii\db\ActiveRecord
 {
+    const ADMIN = 1;
+    const SALES = 2;
+
     /**
      * {@inheritdoc}
      */
