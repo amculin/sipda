@@ -69,10 +69,18 @@ class FController extends Controller
         $searchModel = new ($this->searchModelClass)();
         $dataProvider = $searchModel->search($this->request->queryParams);
 
-        return $this->render('index', [
+        $data = [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-        ]);
+        ];
+
+        if (isset($this->additionalDataClass) && array_key_exists('index', $this->additionalDataClass)) {
+            foreach ($this->additionalDataClass['index'] as $key => $val) {
+                $data[$key] = ($val)::getList();
+            }
+        }
+
+        return $this->render('index', $data);
     }
 
         /**
