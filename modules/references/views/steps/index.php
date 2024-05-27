@@ -3,6 +3,7 @@
 use app\assets\FormModalAsset;
 use app\customs\FActionColumn;
 use app\customs\FDeleteAlert;
+use app\modules\references\models\Tahapan;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
@@ -10,10 +11,11 @@ use yii\grid\GridView;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var app\modules\references\models\KategoriSearch $searchModel */
+/** @var app\modules\references\models\TahapanSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
 ?>
-<div class="page-wrapper" data-menu-active="Referensi" data-submenu-active="Produk">
+
+<div class="page-wrapper" data-menu-active="Referensi" data-submenu-active="Tahapan">
     <div class="container-xl">
         <!-- Page title -->
         <div class="page-header d-print-none">
@@ -23,10 +25,10 @@ use yii\widgets\ActiveForm;
                         <ol class="breadcrumb" aria-label="breadcrumbs">
                             <li class="breadcrumb-item"><a href="<?= Url::to('/dashboard/index', true); ?>">Home</a></li>
                             <li class="breadcrumb-item"><a href="#">Referensi</a></li>
-                            <li class="breadcrumb-item active"><a href="#">Produk</a></li>
+                            <li class="breadcrumb-item active"><a href="#">Tahapan</a></li>
                         </ol>
                     </div>
-                    <h2 class="page-title">Produk</h2>
+                    <h2 class="page-title">Tahapan</h2>
                 </div>
             </div>
         </div>
@@ -35,7 +37,7 @@ use yii\widgets\ActiveForm;
         <div class="container-xl">
             <div class="card">
                 <div class="card-header">
-                    <a href="<?= Url::to('/references/products/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block modal-trigger"
+                    <a href="<?= Url::to('/references/steps/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block modal-trigger"
                         data-bs-toggle="modal" data-bs-target="#modal-form">
                         <i class="bi bi-plus"></i>
                         Tambah Data
@@ -77,52 +79,39 @@ use yii\widgets\ActiveForm;
                                 'contentOptions' => [
                                     'class' => 'text-nowrap d-flex gap-2'
                                 ],
+                                'visibleButtons' => [
+                                    'delete' => function ($model, $key, $index) {
+                                        return $model['nama'] !== 'DEAL' && $model['nama'] !== 'FAIL';
+                                    }
+                                ]
                             ],
                             [
-                                'header' => 'Kategori',
-                                'value' => function ($data) {
-                                    return $data['category'];
-                                },
-                                'headerOptions' => ['width' => '200']
+                                'header' => 'Tahapan',
+                                'value' => function ($model) {
+                                    return $model['nama'];
+                                }
                             ],
                             [
-                                'header' => 'Kode Produk',
-                                'value' => function ($data) {
-                                    return $data['kode'];
+                                'header' => 'Urutan',
+                                'value' => function ($model) {
+                                    return $model['urutan'];
                                 },
-                                'headerOptions' => ['width' => '200']
-                            ],
-                            'nama',
-                            [
-                                'header' => 'Harga Pokok',
-                                'value' => function ($data) {
-                                    return number_format($data['harga_pokok'], 0, ",", ".");
-                                },
-                                'headerOptions' => ['width' => '140', 'class' => 'text-end'],
-                                'contentOptions' => ['class' => 'text-end']
+                                'headerOptions' => ['width' => '100']
                             ],
                             [
-                                'header' => 'Harga Jual',
-                                'value' => function ($data) {
-                                    return number_format($data['harga_jual'], 0, ",", ".");
+                                'header' => 'Warna',
+                                'value' => function ($model) {
+                                    return '<div style="width: 60px;background: ' . $model['warna'] . '; padding: 10px;"></div>';
                                 },
-                                'headerOptions' => ['width' => '140', 'class' => 'text-end'],
-                                'contentOptions' => ['class' => 'text-end']
-                            ],
-                            [
-                                'header' => 'Jumlah Stock',
-                                'value' => function ($data) {
-                                    return $data['jumlah_stock'];
-                                },
-                                'headerOptions' => ['width' => '60', 'class' => 'text-end'],
-                                'contentOptions' => ['class' => 'text-end']
-                            ],
+                                'format'=> 'html',
+                                'headerOptions' => ['width' => '100']
+                            ]
                         ],
                         'pager' => [
                             'class' => 'app\customs\FLinkPager',
                             'options' => ['class' => 'pagination ms-auto m-0'],
                             'linkContainerOptions' => ['class' => 'page-item'],
-                            'linkOptions' => ['class' => 'page-link']
+                            'linkOptions' => ['class' => 'page-link'],
                         ]
                     ]); ?>
                 </div>
@@ -132,7 +121,7 @@ use yii\widgets\ActiveForm;
 </div>
 
 
-<div class="modal fade modal-blur users-form" id="modal-form" tabindex="-1">
+<div class="modal fade modal-blur steps-form" id="modal-form" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
         </div>

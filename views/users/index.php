@@ -7,9 +7,6 @@ use yii\grid\GridView;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
-
-$this->title = 'Provinces';
-$this->params['breadcrumbs'][] = $this->title;
 ?>
 
 <div class="page-wrapper" data-menu-active="Manajemen User" data-submenu-active="">

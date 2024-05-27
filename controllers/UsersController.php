@@ -3,8 +3,10 @@
 namespace app\controllers;
 
 use Yii;
+use app\customs\FController;
 use app\models\UnitSearch;
 use app\models\User;
+use app\models\UserGrup as Role;
 use app\models\UserGrupSearch;
 use app\models\UserSearch;
 use yii\filters\AccessControl;
@@ -17,9 +19,16 @@ use yii\web\Response;
 /**
  * UsersController implements the CRUD actions for User model.
  */
-class UsersController extends Controller
+class UsersController extends FController
 {
     public $enableCsrfValidation = true;
+    public $allowedRoles = [Role::ADMIN];
+    public $additionalDataClass = [
+        'index' => ['roleList' => 'app\models\UserGrupSearch']
+    ];
+    public $modelClass = 'app\models\User';
+    public $searchModelClass = 'app\models\UserSearch';
+    public $title = 'User';
 
     /**
      * @inheritDoc
@@ -29,21 +38,6 @@ class UsersController extends Controller
         return array_merge(
             parent::behaviors(),
             [
-                'access' => [
-                    'class' => AccessControl::class,
-                    'rules' => [
-                        [
-                            'allow' => true,
-                            'matchCallback' => function ($rule, $action) {
-                                if (Yii::$app->user->isGuest) {
-                                    return false;
-                                } else {
-                                    return Yii::$app->user->identity->id_grup === 1;
-                                }
-                            }
-                        ],
-                    ],
-                ],
                 'verbs' => [
                     'class' => VerbFilter::className(),
                     'actions' => [
@@ -56,28 +50,7 @@ class UsersController extends Controller
     }
 
     /**
-     * Lists all User models.
-     *
-     * @return string
-     */
-    public function actionIndex()
-    {
-        $searchModel = new UserSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-        $roleList = UserGrupSearch::getList();
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-            'roleList' => $roleList
-        ]);
-    }
-
-    /**
-     * Creates a new User model.
-     * If request comes in AJAX, it will render the form or do the validation.
-     * If creation is successful, the browser will be redirected to the 'index' page.
-     * @return string|\yii\web\Response
+     * @inheritdoc
      */
     public function actionCreate()
     {
@@ -96,7 +69,7 @@ class UsersController extends Controller
 
                 return $this->renderAjax('_form', [
                     'model' => $model,
-                    'title' => 'Tambah User',
+                    'title' => 'Tambah ' . $this->title,
                     'roleList' => $roleList,
                     'unitList' => $unitList
                 ]);
@@ -113,12 +86,7 @@ class UsersController extends Controller
     }
 
     /**
-     * Updates an existing User model.
-     * If request comes in AJAX, it will render the form or do the validation.
-     * If update is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
+     * @inheritdoc
      */
     public function actionUpdate($id)
     {
@@ -141,7 +109,7 @@ class UsersController extends Controller
 
                 return $this->renderAjax('_form', [
                     'model' => $model,
-                    'title' => 'Edit User',
+                    'title' => 'Edit ' . $this->title,
                     'roleList' => $roleList,
                     'unitList' => $unitList
                 ]);
@@ -156,47 +124,6 @@ class UsersController extends Controller
                 return $this->redirect(['index']);
             }
         }
-    }
-
-    /**
-     * Deletes an existing User model.
-     * If deletion is successful, the system will return success message.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws UnprocessableEntityHttpException if the action cannot be executed
-     */
-    public function actionDelete($id)
-    {
-        Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-        $model = $this->findModel($id);
-        $model->scenario = $model::SCENARIO_SOFT_DELETION;
-        $model->is_deleted = $model::IS_DELETED;
-
-        if (! $model->save()) {
-            throw new yii\web\UnprocessableEntityHttpException('Gagal');
-        }
-
-        return [
-            'code' => 200,
-            'message' => 'Sukses'
-        ];
-    }
-
-    /**
-     * Finds the User model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return User the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = User::findOne(['id' => $id])) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
     }
 
     /**

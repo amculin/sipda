@@ -53,12 +53,12 @@ class UserSearch extends User
         }
 
         if ($this->nama) {
-            $filters[] = 'u.username LIKE :name OR u.nama LIKE :name OR u.email LIKE :name';
+            $filters[] = '(u.username LIKE :name OR u.nama LIKE :name OR u.email LIKE :name)';
             $bound[':name'] = "%{$this->nama}%";
         }
 
         if (count($filters) > 0) {
-            $where .= ' AND (' . implode(' AND ', $filters) . ')';
+            $where .= ' AND ' . implode(' AND ', $filters);
         }
 
         $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM user u' . $where, $bound)->queryScalar();
@@ -71,7 +71,7 @@ class UserSearch extends User
             'params' => $bound,
             'totalCount' => $count,
             'pagination' => [
-                'pageSize' => 15,
+                'pageSize' => Yii::$app->params['pageSize'],
             ],
         ];
 

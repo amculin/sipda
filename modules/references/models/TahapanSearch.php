@@ -5,12 +5,11 @@ namespace app\modules\references\models;
 use Yii;
 use yii\base\Model;
 use yii\data\SqlDataProvider;
-use yii\helpers\ArrayHelper;
 
 /**
- * KategoriSearch represents the model behind the search form of `app\modules\references\models\Kategori`.
+ * TahapanSearch represents the model behind the search form of `app\modules\references\models\Tahapan`.
  */
-class KategoriSearch extends Kategori
+class TahapanSearch extends Tahapan
 {
     /**
      * {@inheritdoc}
@@ -18,8 +17,8 @@ class KategoriSearch extends Kategori
     public function rules()
     {
         return [
-            [['id', 'id_unit', 'is_deleted'], 'integer'],
-            [['nama'], 'safe'],
+            [['id', 'id_unit', 'urutan'], 'integer'],
+            [['nama', 'warna'], 'safe'],
         ];
     }
 
@@ -41,21 +40,22 @@ class KategoriSearch extends Kategori
      */
     public function search($params)
     {
+
         $bound = [
             ':unitID' => Yii::$app->user->identity->id_unit,
             ':status' => $this::IS_NOT_DELETED
         ];
-        $where = ' WHERE k.id_unit = :unitID AND k.is_deleted = :status';
+        $where = ' WHERE t.id_unit = :unitID AND t.is_deleted = :status';
 
         $this->load($params);
 
         if ($this->nama) {
-            $where .= ' AND k.nama LIKE :name';
+            $where .= ' AND t.nama LIKE :name';
             $bound[':name'] = "%{$this->nama}%";
         }
 
-        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM kategori k' . $where, $bound)->queryScalar();
-        $sql = "SELECT k.id, k.nama FROM kategori k
+        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM tahapan t' . $where, $bound)->queryScalar();
+        $sql = "SELECT t.id, t.nama, t.urutan, t.warna FROM tahapan t
         {$where}";
 
         $config = [
@@ -63,24 +63,12 @@ class KategoriSearch extends Kategori
             'params' => $bound,
             'totalCount' => $count,
             'pagination' => [
-                'pageSize' => Yii::$app->params['pageSize'],
+                'pageSize' => 15,
             ],
         ];
 
         $provider = new SqlDataProvider($config);
 
         return $provider;
-    }
-
-    public static function getList()
-    {
-        $sql = "SELECT id, nama FROM kategori WHERE id_unit = :unitID AND is_deleted = :status ORDER BY nama ASC";
-
-        $data = Yii::$app->db->createCommand($sql, [
-            ':unitID' => Yii::$app->user->identity->id_unit,
-            ':status' => parent::IS_NOT_DELETED
-        ])->queryAll();
-
-        return ArrayHelper::map($data, 'id', 'nama');
     }
 }
