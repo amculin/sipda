@@ -63,7 +63,7 @@ class TahapanSearch extends Tahapan
             'params' => $bound,
             'totalCount' => $count,
             'pagination' => [
-                'pageSize' => 15,
+                'pageSize' => Yii::$app->params['pageSize'],
             ],
         ];
 
