@@ -126,13 +126,13 @@ use yii\widgets\ActiveForm;
                             [
                                 'header' => $searchModel->attributeLabels()['tanggal_mulai'],
                                 'value' => function ($data) {
-                                    return $data['tanggal_mulai'];
+                                    return date('d F Y', strtotime($data['tanggal_mulai']));
                                 },
                             ],
                             [
                                 'header' => $searchModel->attributeLabels()['tanggal_selesai'],
                                 'value' => function ($data) {
-                                    return $data['tanggal_selesai'];
+                                    return date('d F Y', strtotime($data['tanggal_selesai']));
                                 },
                             ],
                         ],
