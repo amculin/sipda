@@ -101,7 +101,7 @@ use yii\widgets\ActiveForm;
                                             'title' => $model['is_disabled'] == 1 ? 'Enable' : 'Disable'
                                         ]);
                         
-                                        return Html::a($icon, $url, ['class' => 'text-dark lock-user']);
+                                        return Html::a($icon, $url, ['class' => 'text-dark lock-event']);
                                     }
                                 ],
                             ],
@@ -159,4 +159,51 @@ use yii\widgets\ActiveForm;
 
 <?php
 FormModalAsset::register($this);
+
+$js = "
+$('#w1 a.lock-event').click(function(event) {
+    event.preventDefault();
+    
+    var url = $(this).attr('href');
+    var action = ($(this).find('i').attr('data-bs-original-title') == 'Enable') ? 'Enable' : 'Disable';
+    var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
+
+    Swal.fire({
+        title: action + ' Event?',
+        text: 'Apakah anda yakin?',
+        icon: 'warning',
+        showCancelButton: true,
+        reverseButtons:true,
+        confirmButtonText: 'Ya, ' + action + ' Event!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url : url,
+                type : 'POST',
+                data: {_csrf : csrfToken},
+                success : function(data){
+                    if (data.code == 200) {
+                        var title = 'Sukses!';
+                        var message = 'Event Berhasil Di-' + action.toLowerCase();
+                        var icon = 'success';
+                    } else {
+                        var title = 'Gagal!';
+                        var message = 'Event Gagal Di' + action.toLowerCase();
+                        var icon = 'error';
+                    }
+                    Swal.fire(
+                        title,
+                        message,
+                        icon
+                    ).then((result) => {
+                        location.reload();
+                    });
+                }
+            });
+        }
+    })
+});
+";
+
+$this->registerJs($js, $this::POS_END, 'event-lock-handler');
 ?>
