@@ -5,6 +5,7 @@ namespace app\models;
 use Yii;
 use yii\base\Model;
 use yii\data\SqlDataProvider;
+use yii\helpers\ArrayHelper;
 use app\models\User;
 
 /**
@@ -78,5 +79,20 @@ class UserSearch extends User
         $provider = new SqlDataProvider($config);
 
         return $provider;
+    }
+
+    public static function getList()
+    {
+        $sql = "SELECT id, nama
+            FROM user
+            WHERE id_unit = :unitID AND id_grup = :roleID
+            ORDER BY nama ASC";
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':unitID' => Yii::$app->user->identity->id_unit,
+            ':roleID' => USerGrup::SALES
+        ])->queryAll();
+
+        return ArrayHelper::map($data, 'id', 'nama');
     }
 }
