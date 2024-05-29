@@ -193,15 +193,13 @@ class User extends \yii\db\ActiveRecord
     {
         if ($insert) {
             if ($this->id_grup != 1) {
-                for ($i = 1; $i <= 12; $i++) {
-                    $plan = new Plan();
-                    $plan->id_sales = $this->id;
-                    $plan->tahun = date('Y');
-                    $plan->bulan = $i;
-                    $plan->target_penjualan = 0;
-                    $plan->target_komisi = 0;
-                    $plan->save();
-                }
+                $plan = new Plan();
+                $plan->id_unit = $this->id_unit;
+                $plan->id_sales = $this->id;
+                $plan->tahun = date('Y');
+                $plan->target_penjualan = 0;
+                $plan->target_komisi = 0;
+                $plan->save();
             }
         } else {
             if ($this->scenario == $this::SCENARIO_SOFT_DELETION) {
