@@ -71,4 +71,16 @@ class TahapanSearch extends Tahapan
 
         return $provider;
     }
+
+    public static function getList()
+    {
+        $sql = "SELECT id, nama, warna FROM tahapan WHERE id_unit = :unitID AND is_deleted = :status ORDER BY urutan ASC";
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':unitID' => Yii::$app->user->identity->id_unit,
+            ':status' => parent::IS_NOT_DELETED
+        ])->queryAll();
+
+        return $data;
+    }
 }

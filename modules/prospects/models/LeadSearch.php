@@ -1,25 +1,28 @@
 <?php
 
-namespace app\modules\references\models;
+namespace app\modules\prospects\models;
 
 use Yii;
 use yii\base\Model;
 use yii\data\SqlDataProvider;
-use yii\helpers\ArrayHelper;
+use app\models\UserGrup as Role;
+use app\modules\prospects\models\Lead;
 
 /**
- * ProgramSearch represents the model behind the search form of `app\modules\references\models\Program`.
+ * LeadSearch represents the model behind the search form of `app\modules\prospects\models\Lead`.
  */
-class ProgramSearch extends Program
+class LeadSearch extends Lead
 {
+    public $nama;
+
     /**
      * {@inheritdoc}
      */
     public function rules()
     {
         return [
-            [['tanggal_mulai'], 'integer'],
-            [['nama', 'kode'], 'string']
+            [['id_sales', 'id_tahapan', 'year'], 'integer'],
+            [['nama', 'id_sales', 'id_tahapan', 'year'], 'safe'],
         ];
     }
 
@@ -45,24 +48,35 @@ class ProgramSearch extends Program
             ':unitID' => Yii::$app->user->identity->id_unit,
             ':status' => $this::IS_NOT_DELETED
         ];
-        $where = ' WHERE p.id_unit = :unitID AND p.is_deleted = :status';
 
-        $this->load($params);
+        $where = ' WHERE l.id_unit = :unitID AND l.is_deleted = :status';
+
+        if (Yii::$app->user->identity->id_grup == Role::SALES) {
+            $where .= ' AND l.id_sales = :salesID';
+            $bound[':salesID'] = Yii::$app->user->identity->id;
+        }
 
         if ($this->nama) {
-            $where .= ' AND (p.kode LIKE :name OR p.nama LIKE :name)';
+            $where .= ' AND (u.nama LIKE :name OR l.nama_perusahaan)';
             $bound[':name'] = "%{$this->nama}%";
         }
 
+        if ($this->id_tahapan) {
+            $where .= ' AND l.id_tahapan = :stepID';
+            $bound[':stepID'] = $this->id_tahapan;
+        }
+
         if ($this->year) {
-            $where .= ' AND p.year = :year';
+            $where .= ' AND l.year = :year';
             $bound[':year'] = $this->year;
         }
 
-        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM program p' . $where, $bound)->queryScalar();
-        $sql = "SELECT p.id, p.kode, p.nama, p.lokasi, p.tanggal_mulai, p.tanggal_selesai, p.is_disabled
-        FROM program p
-        {$where}";
+        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM `lead` l
+            LEFT JOIN `user` u ON (u.id = l.id_sales)' . $where, $bound)->queryScalar();
+        $sql = "SELECT l.id, l.kode, l.nama_perusahaan, l.kebutuhan, l.id_tahapan, l.nilai, u.nama
+            FROM `lead` l
+            LEFT JOIN `user` u ON (u.id = l.id_sales)
+            {$where}";
 
         $config = [
             'sql' => $sql,
@@ -81,10 +95,10 @@ class ProgramSearch extends Program
     public static function getLastCounter()
     {
         $year = date('Y');
-        $sql = "SELECT p.counter
-            FROM program p
-            WHERE p.year = :year
-            ORDER BY id DESC
+        $sql = "SELECT l.counter
+            FROM `lead` l
+            WHERE l.year = :year
+            ORDER BY l.id DESC
             LIMIT 1";
 
         $data = Yii::$app->db->createCommand($sql, [
@@ -96,21 +110,6 @@ class ProgramSearch extends Program
 
     public static function createUniqueCode($lastCounter)
     {
-        return 'EV' . substr(date('Y'), 2, 2)
-            . date('m') . str_pad($lastCounter, 4, '0', STR_PAD_LEFT);
-    }
-
-    public static function getList()
-    {
-        $sql = "SELECT p.id, CONCAT_WS(' - ', p.kode, p.nama) AS event_name FROM `program` p
-            WHERE id_unit = :unitID AND is_deleted = :status
-            ORDER BY nama ASC";
-
-        $data = Yii::$app->db->createCommand($sql, [
-            ':unitID' => Yii::$app->user->identity->id_unit,
-            ':status' => parent::IS_NOT_DELETED
-        ])->queryAll();
-
-        return ArrayHelper::map($data, 'id', 'event_name');
+        return 'PK' . date('Y') . str_pad($lastCounter, 5, '0', STR_PAD_LEFT);
     }
 }
