@@ -13,10 +13,31 @@ use yii\widgets\ActiveForm;
 /** @var yii\data\ActiveDataProvider $dataProvider */
 /** @var yii\web\View $this */
 /** @var yii\widgets\ActiveForm $form */
+
+if (! is_null($stepId)) {
+    $css = "
+    .nav-theme .nav-link.active{
+        background: {$backgroundColor};
+        color:#2D5DFF;
+        border-color:transparent;
+        font-weight: bold;
+    }    
+    .card-header-theme{
+        background: {$backgroundColor};
+    }";
+    $this->registerCss($css);
+}
 ?>
 <div class="card-header card-header-theme">
+    <?php if ($stepId == $stepList[0]['id']) { ?>
+    <a href="<?= Url::to('/prospects/leads/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block me-2 modal-trigger"
+        data-bs-toggle="modal" data-bs-target="#modal-form">
+        <i class="bi bi-plus"></i>
+        Tambah Data
+    </a>
+    <?php } ?>
     <a href="<?= Url::to('/broadcast/channels/create', true); ?>" class="btn btn-default d-none d-sm-inline-block modal-trigger"
-        data-bs-toggle="modal" data-bs-target="#modal-channel">Tambahkan ke Channel
+        data-bs-toggle="modal" data-bs-target="#modal-channel"><i class="bi bi-person-add"></i> Tambahkan ke Channel
     </a>
     <div class="ms-auto d-flex gap-2">
         <?php $form = ActiveForm::begin([
@@ -45,11 +66,20 @@ use yii\widgets\ActiveForm;
             'style' => 'width: 160px;',
             'tag' => false
         ])->label(false);
+
+        if (is_null($stepId)) {
+            echo $form->field($searchModel, 'id_tahapan', ['options' => ['tag' => false]])->dropDownList($stepList, [
+                'prompt' => 'Semua Tahapan',
+                'class' => 'form-select',
+                'style' => 'width: 160px;',
+                'tag' => false
+            ])->label(false);
+        }
         ?>
-        <div class="input-group">
+        <div class="input-group" style="width: 160px;">
             <?= $form->field($searchModel, 'nama', ['options' => ['tag' => false]])->textInput([
                 'placeholder' => 'Cari data..',
-                'tag' => false
+                'tag' => false,
             ])->label(false); ?>
             <?= Html::submitButton('<i class="bi bi-search"></i>', ['class' => 'btn']) ?>
         </div>
@@ -67,6 +97,9 @@ use yii\widgets\ActiveForm;
                 'class' => 'yii\grid\SerialColumn',
                 'header' => 'No',
                 'headerOptions' => ['width' => '5'],
+            ],
+            [
+                'class' => 'yii\grid\CheckboxColumn',
             ],
             [
                 'class' => FActionColumn::className(),
@@ -100,11 +133,22 @@ use yii\widgets\ActiveForm;
                         return Html::a($icon, $url, ['class' => 'text-warning modal-trigger']);
                     },
                     'convert' => function ($url, $model, $key) {
+                        $iconClass = ($model['step'] == 'FAIL' || $model['step'] == 'DEAL') ? 'bi bi-x-circle'
+                            : 'bi bi-arrow-right-circle-fill';
+
+                        if ($model['step'] == 'FAIL') {
+                            $title = 'Batal Fail';
+                        } else if ($model['step'] == 'DEAL') {
+                            $title = 'Batal Deal';
+                        } else {
+                            $title = 'Konversi';
+                        }
+
                         $icon = Html::tag('i', '', [
-                            'class' => 'bi bi-arrow-right-circle-fill',
+                            'class' => $iconClass,
                             'data-bs-toggle' => 'tooltip',
                             'data-bs-placement' => 'bottom',
-                            'title' => 'Konversi'
+                            'title' => $title
                         ]);
         
                         return Html::a($icon, $url, ['class' => 'text-success modal-trigger']);
@@ -132,7 +176,7 @@ use yii\widgets\ActiveForm;
             [
                 'header' => $searchModel->attributeLabels()['nama_perusahaan'],
                 'value' => function ($data) {
-                    return $data['nama_perusahaan'];
+                    return $data['warna'];
                 },
             ],
             [
@@ -147,12 +191,21 @@ use yii\widgets\ActiveForm;
                 'header' => $searchModel->attributeLabels()['id_tahapan'],
                 'value' => function ($data) {
                     $content = Html::tag('i', '', ['class' => $data['icon'] . ' pe-2']);
-
-                    return Html::a($content . $data['step'], '#', ['class' => 'btn btn-info btn-sm rounded-pill']);
+                    $css = "
+                        a.step-status {
+                            --tblr-btn-color-text: black;
+                        }
+                    ";
+                    $this->registerCss($css);
+                    return Html::a($content . $data['step'], '#', [
+                        'class' => 'btn btn-sm rounded-pill step-status',
+                        'style' => "background-color: {$data['warna']}"
+                    ]);
                 },
                 'headerOptions' => ['class' => 'text-center'],
                 'contentOptions' => ['class' => 'text-nowrap gap-2 text-center'],
-                'format' => 'html'
+                'format' => 'html',
+                'visible' => (is_null($stepId) == true)
             ],
         ],
         'pager' => [

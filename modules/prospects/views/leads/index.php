@@ -60,11 +60,13 @@ use yii\grid\GridView;
                 <?php
                 $viewFile = is_null($stepId) ? '_index-all' : '_index-by-step';
 
-                echo $this->render($viewFile, [
+                echo $this->render('_index-all', [
                     'searchModel' => $searchModel,
                     'dataProvider' => $dataProvider,
                     'stepList' => $stepList,
                     'salesList' => $salesList,
+                    'backgroundColor' => $backgroundColor,
+                    'stepId' => $stepId
                 ]);
                 ?>
             </div>

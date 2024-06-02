@@ -74,7 +74,7 @@ class LeadSearch extends Lead
         $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM `lead` l
             LEFT JOIN `user` u ON (u.id = l.id_sales)' . $where, $bound)->queryScalar();
         $sql = "SELECT l.id, l.kode, l.nama_perusahaan, l.kebutuhan, l.id_tahapan, l.nilai, u.nama,
-                t.nama AS `step`, t.icon
+                t.nama AS `step`, t.warna, t.icon
             FROM `lead` l
             LEFT JOIN `user` u ON (u.id = l.id_sales)
             LEFT JOIN `tahapan` t ON (t.id = l.id_tahapan)
