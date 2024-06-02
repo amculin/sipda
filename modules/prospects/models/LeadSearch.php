@@ -73,9 +73,11 @@ class LeadSearch extends Lead
 
         $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM `lead` l
             LEFT JOIN `user` u ON (u.id = l.id_sales)' . $where, $bound)->queryScalar();
-        $sql = "SELECT l.id, l.kode, l.nama_perusahaan, l.kebutuhan, l.id_tahapan, l.nilai, u.nama
+        $sql = "SELECT l.id, l.kode, l.nama_perusahaan, l.kebutuhan, l.id_tahapan, l.nilai, u.nama,
+                t.nama AS `step`, t.icon
             FROM `lead` l
             LEFT JOIN `user` u ON (u.id = l.id_sales)
+            LEFT JOIN `tahapan` t ON (t.id = l.id_tahapan)
             {$where}";
 
         $config = [
@@ -110,6 +112,6 @@ class LeadSearch extends Lead
 
     public static function createUniqueCode($lastCounter)
     {
-        return 'PK' . date('Y') . str_pad($lastCounter, 5, '0', STR_PAD_LEFT);
+        return 'PK' . date('Y') . '-' . str_pad($lastCounter, 5, '0', STR_PAD_LEFT);
     }
 }

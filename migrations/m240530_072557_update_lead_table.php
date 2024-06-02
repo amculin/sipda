@@ -19,6 +19,8 @@ class m240530_072557_update_lead_table extends Migration
         $this->execute("ALTER TABLE `lead` ADD `year` YEAR NOT NULL AFTER `timestamp`");
         $this->execute("ALTER TABLE `lead` ADD INDEX(`year`)");
         $this->execute("ALTER TABLE `lead` ADD `counter` SMALLINT UNSIGNED NOT NULL AFTER `year`");
+        $this->execute("ALTER TABLE `lead` CHANGE `kode` `kode` CHAR(12) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_general_ci NOT NULL;");
 
     }
 
@@ -31,5 +33,7 @@ class m240530_072557_update_lead_table extends Migration
         $this->dropColumn('lead', 'id_unit');
         $this->dropColumn('lead', 'year');
         $this->dropColumn('lead', 'counter');
+        $this->execute("ALTER TABLE `lead` CHANGE `kode` `kode` VARCHAR(32) CHARACTER SET utf8mb4
+            COLLATE utf8mb4_general_ci NOT NULL;");
     }
 }

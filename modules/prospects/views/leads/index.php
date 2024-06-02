@@ -35,15 +35,10 @@ use yii\grid\GridView;
                     <ul class="nav nav-tabs border-0 nav-theme">
                         <?php
                         $backgroundColor = null;
-                        $iconList = [
-                            'bi bi-snow3', 'bi bi-cloud-sun', 'bi bi-sun', 'bi bi-check2-circle', 'bi bi-slash-circle'
-                        ];
-                        $i = 0;
                         
                         foreach ($stepList as $key => $val) {
                             echo Html::beginTag('li', ['class' => 'nav-item']);
-                            $iconClass = array_key_exists($i, $iconList) ? $iconList[$i] : 'bi bi-grid';
-                            $content = Html::tag('i', ' ', ['class' => $iconClass . ' fs-3 me-2']);
+                            $content = Html::tag('i', ' ', ['class' => $val['icon'] . ' fs-3 me-2']);
                             $linkClass = 'nav-link';
                             $linkClass .= $stepId == $val['id'] ? ' active' : '';
                             echo Html::a($content. ' ' . $val['nama'], Url::to(['/prospects/leads/index', 'stepId' => $val['id']], true), ['class' => $linkClass]);
@@ -52,12 +47,11 @@ use yii\grid\GridView;
                             if ($stepId == $val['id']) {
                                 $backgroundColor = $val['warna'];
                             }
-
-                            $i++;
                         }
                         ?>
                         <li class="nav-item">
-                            <a href="<?= Url::to(['/prospects/leads/index', 'stepId' => null], true); ?>" class="nav-link">
+                            <?php $linkClass = is_null($stepId) ? ' active' : ''; ?>
+                            <a href="<?= Url::to(['/prospects/leads/index', 'stepId' => null], true); ?>" class="nav-link<?= $linkClass; ?>">
                                 <i class="bi bi-book fs-3 me-2"></i> ALL DATA
                             </a>
                         </li>
@@ -71,7 +65,6 @@ use yii\grid\GridView;
                     'dataProvider' => $dataProvider,
                     'stepList' => $stepList,
                     'salesList' => $salesList,
-                    'iconList' => $iconList
                 ]);
                 ?>
             </div>
