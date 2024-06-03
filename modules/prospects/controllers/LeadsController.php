@@ -2,6 +2,7 @@
 
 namespace app\modules\prospects\controllers;
 
+use Yii;
 use app\customs\FController;
 use app\models\UserGrup as Role;
 use app\models\UserSearch;
@@ -43,7 +44,8 @@ class LeadsController extends FController
 
         $dataProvider = $searchModel->search($this->request->queryParams);
         $stepList = TahapanSearch::getList();
-        $salesList = UserSearch::getList();
+        $salesList = Yii::$app->user->identity->id_grup == Role::ADMIN ? UserSearch::getList()
+            : [];
 
         return $this->render('index', [
             'searchModel' => $searchModel,

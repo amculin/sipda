@@ -3,6 +3,7 @@
 use app\assets\FormModalAsset;
 use app\customs\FActionColumn;
 use app\customs\FDeleteAlert;
+use app\models\UserGrup as Role;
 use yii\grid\GridView;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
@@ -41,7 +42,7 @@ if (! is_null($stepId)) {
     </a>
     <div class="ms-auto d-flex gap-2">
         <?php $form = ActiveForm::begin([
-            'action' => ['index'],
+            'action' => ['index', 'stepId' => $stepId],
             'method' => 'get',
             'options' => ['style' => 'display: contents;']
         ]);
@@ -53,12 +54,14 @@ if (! is_null($stepId)) {
             $yearList[$i] = $i;
         }
 
-        echo $form->field($searchModel, 'id_sales', ['options' => ['tag' => false]])->dropDownList($salesList, [
-            'prompt' => 'Semua Sales',
-            'class' => 'form-select',
-            'style' => 'width: 160px;',
-            'tag' => false
-        ])->label(false);
+        if (Yii::$app->user->identity->id_grup == Role::ADMIN) {
+            echo $form->field($searchModel, 'id_sales', ['options' => ['tag' => false]])->dropDownList($salesList, [
+                'prompt' => 'Semua Sales',
+                'class' => 'form-select',
+                'style' => 'width: 160px;',
+                'tag' => false
+            ])->label(false);
+        }
 
         echo $form->field($searchModel, 'year', ['options' => ['tag' => false]])->dropDownList($yearList, [
             'prompt' => 'Semua Tahun',
@@ -160,6 +163,7 @@ if (! is_null($stepId)) {
                 'value' => function ($data) {
                     return $data['nama'];
                 },
+                'visible' => (Yii::$app->user->identity->id_grup == Role::ADMIN)
             ],
             [
                 'header' => $searchModel->attributeLabels()['kode'],
@@ -176,7 +180,7 @@ if (! is_null($stepId)) {
             [
                 'header' => $searchModel->attributeLabels()['nama_perusahaan'],
                 'value' => function ($data) {
-                    return $data['warna'];
+                    return $data['nama_perusahaan'];
                 },
             ],
             [

@@ -51,13 +51,17 @@ class LeadSearch extends Lead
 
         $where = ' WHERE l.id_unit = :unitID AND l.is_deleted = :status';
 
-        if (Yii::$app->user->identity->id_grup == Role::SALES) {
+        $this->load($params);
+
+        if ((Yii::$app->user->identity->id_grup == Role::SALES) || ($this->id_sales)) {
+            $salesID = (Yii::$app->user->identity->id_grup == Role::SALES) ? Yii::$app->user->identity->id
+                : $this->id_sales;
             $where .= ' AND l.id_sales = :salesID';
-            $bound[':salesID'] = Yii::$app->user->identity->id;
+            $bound[':salesID'] = $salesID;
         }
 
         if ($this->nama) {
-            $where .= ' AND (u.nama LIKE :name OR l.nama_perusahaan)';
+            $where .= ' AND (u.nama LIKE :name OR l.nama_perusahaan LIKE :name)';
             $bound[':name'] = "%{$this->nama}%";
         }
 
