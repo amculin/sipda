@@ -37,8 +37,10 @@ if (! is_null($stepId)) {
         Tambah Data
     </a>
     <?php } ?>
-    <a href="<?= Url::to('/broadcast/channels/create', true); ?>" class="btn btn-default d-none d-sm-inline-block modal-trigger"
-        data-bs-toggle="modal" data-bs-target="#modal-channel"><i class="bi bi-person-add"></i> Tambahkan ke Channel
+    <a href="<?= Url::to('/broadcasts/channel-details/create-from-lead', true); ?>"
+        class="btn btn-default d-none d-sm-inline-block add-to-channel-modal-trigger" data-bs-toggle="modal" data-bs-target="#modal-form"
+        id="add-to-channel">
+        <i class="bi bi-person-add"></i> Tambahkan ke Channel
     </a>
     <div class="ms-auto d-flex gap-2">
         <?php $form = ActiveForm::begin([
@@ -103,6 +105,12 @@ if (! is_null($stepId)) {
             ],
             [
                 'class' => 'yii\grid\CheckboxColumn',
+                'checkboxOptions' => function ($model, $key, $index, $column) {
+                    return [
+                        'class' => 'add-to-channel-checkbox',
+                        'value' => $model['id']
+                    ];
+                }
             ],
             [
                 'class' => FActionColumn::className(),
@@ -231,4 +239,45 @@ if (! is_null($stepId)) {
 
 <?php
 FormModalAsset::register($this);
+
+$js = "
+$('a.add-to-channel-modal-trigger').click(function(event) {
+    event.preventDefault();
+    var url = $(this).attr('href');
+    var valueList = [];
+    
+    $('input[type=checkbox]').each(function(){
+        if ($(this).is(':checked') && $(this).hasClass('add-to-channel-checkbox')) {
+            valueList.push($(this).val());  
+        }
+    })
+
+    if (valueList.length < 1) {
+        Swal.fire({
+            title: 'Info',
+            text: 'Silakan centang terlebih dahulu data yang akan dipilih',
+            icon: 'warning',
+            showCancelButton: false,
+            reverseButtons:false,
+        }).then((result) => {
+            Swal.close();
+            $('#modal-form').modal('hide')
+        })
+
+        return false;
+    }
+
+    var values = valueList.join(',');
+
+    $.ajax({
+        url : url + '?leadCollections=' + values,
+        type : 'POST',
+        success : function(data) {
+            $('div#modal-form div div.modal-content').html(data);
+        }
+    });
+});
+";
+
+$this->registerJs($js, $this::POS_END, 'checkbox-handler');
 ?>
