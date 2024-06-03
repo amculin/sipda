@@ -65,6 +65,7 @@ class Lead extends \yii\db\ActiveRecord
             [['kode'], 'string', 'max' => 32],
             [['nama_klien', 'nama_perusahaan'], 'string', 'max' => 128],
             [['nomor_telepon', 'email'], 'string', 'max' => 64],
+            [['email'], 'email'],
             [['kebutuhan'], 'string', 'max' => 512],
             [['kode'], 'unique'],
             [['id_unit'], 'exist', 'skipOnError' => true, 'targetClass' => Unit::class, 'targetAttribute' => ['id_unit' => 'id']],
