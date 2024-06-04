@@ -66,7 +66,7 @@ class Aktivitas extends \yii\db\ActiveRecord
             'lokasi' => 'Lokasi',
             'aktivitas' => 'Aktivitas',
             'progres' => 'Progres',
-            'id_status' => 'Id Status',
+            'id_status' => 'Status',
             'is_deleted' => 'Is Deleted',
             'timestamp' => 'Timestamp',
         ];

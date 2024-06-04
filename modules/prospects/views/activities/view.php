@@ -2,14 +2,15 @@
 
 use app\assets\FormModalAsset;
 use app\modules\prospects\models\Aktivitas;
+use app\modules\prospects\models\AktivitasStatus as Status;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
 /** @var yii\web\View $this */
-/** @var app\modules\prospects\models\AktivitasSearch $searchModel */
-/** @var yii\data\ActiveDataProvider $dataProvider */
+/** @var app\modules\prospects\models\AktivitasSearch $activities */
+/** @var app\modules\prospects\models\LeadSearch $lead */
 
 ?>
 <div class="page-wrapper" data-menu-active="Prospek">
@@ -88,121 +89,58 @@ use yii\grid\GridView;
                     </a>
                 </div>
                 <div class="list-group">
-                    <div class="list-group-item">
-                        <div class="row">
-                            <div class="col-auto">
-                                <span class="avatar bg-success rounded-circle"><i class="bi bi-check h1 m-0"></i></span>
-                            </div>
-                            <div class="col">
-                                <div class="fw-bold mb-1 text-truncate">Meeting Awal</div>
-                                <div class="text-secondary fs-5 hstack gap-3">
-                                    <span><i class="bi bi-calendar-week me-1"></i> 5 September 2023</span>
-                                    <span><i class="bi bi-geo me-1"></i> PT. Citra Gemilang</span>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="fs-4 fw-bold">Progres:</div>
-                                <div class="text-secondary fs-5">
-                                    Sudah terlaksana.
-                                </div>
-                            </div>
-                            <div class="col-lg-auto">
-                                <div class="dropdown">
-                                    <a href="#" class="dropdown" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-form"><i class="bi bi-pencil me-2"></i> Edit</a>
-                                        <a href="#" class="dropdown-item text-danger" onclick="deleteData();"><i class="bi bi-trash me-2"></i> Hapus</a>
+                    <?php
+                    if ($activities) {
+                        foreach ($activities as $key => $val) {
+                            $isQuotation = (strpos($val['aktivitas'], 'Quotation') !== false);
+                            $status = function($status, $isQuotation) {
+                                if (!$isQuotation) {
+                                    if ($status == Status::OPEN) {
+                                        return '<span class="avatar rounded-circle"></span>';
+                                    } else {
+                                        return '<span class="avatar bg-success rounded-circle"><i class="bi bi-check h1 m-0"></i></span>';
+                                    }
+                                } else {
+                                    return '<span class="avatar bg-warning rounded-circle"><i class="bi bi-envelope-paper h1 m-0"></i></span>';
+                                }
+                            };
+                    ?>
+                            <div class="list-group-item">
+                                <div class="row">
+                                    <div class="col-auto">
+                                        <?= $status($val['id_status'], $isQuotation); ?>
+                                    </div>
+                                    <div class="col">
+                                        <div class="fw-bold mb-1 text-truncate"><?= $val['aktivitas']; ?></div>
+                                        <div class="text-secondary fs-5 hstack gap-3">
+                                            <span><i class="bi bi-calendar-week me-1"></i> <?= date('d F Y', strtotime($val['tanggal'])); ?></span>
+                                            <span><i class="bi bi-geo me-1"></i> <?= $val['lokasi']; ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="fs-4 fw-bold"><?= $isQuotation ? 'Harga Penawaran:' : 'Progres:'; ?></div>
+                                        <div class="text-secondary fs-5">
+                                            <?= $isQuotation ? 'Rp ' . $val['progres'] : $val['progres']; ?>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-auto">
+                                        <div class="dropdown">
+                                            <a href="#" class="dropdown" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></a>
+                                            <div class="dropdown-menu dropdown-menu-end">
+                                                <a href="<?= Url::to(['update', 'id' => $val['id']]); ?>" class="dropdown-item modal-trigger"
+                                                    data-bs-toggle="modal" data-bs-target="#modal-form"><i class="bi bi-pencil me-2"></i> Edit</a>
+                                                <a href="#" class="dropdown-item text-danger" onclick="deleteData();"><i class="bi bi-trash me-2"></i> Hapus</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="row">
-                            <div class="col-auto">
-                                <span class="avatar bg-success rounded-circle"><i class="bi bi-check h1 m-0"></i></span>
-                            </div>
-                            <div class="col">
-                                <div class="fw-bold mb-1 text-truncate">Meeting Teknis</div>
-                                <div class="text-secondary fs-5 hstack gap-3">
-                                    <span><i class="bi bi-calendar-week me-1"></i> 12 September 2023</span>
-                                    <span><i class="bi bi-geo me-1"></i> PT. Citra Gemilang</span>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="fs-4 fw-bold">Progres:</div>
-                                <div class="text-secondary fs-5">
-                                    Sudah terlaksana, jadwal pengerjaan mohon dipercepat.
-                                </div>
-                            </div>
-                            <div class="col-lg-auto">
-                                <div class="dropdown">
-                                    <a href="#" class="dropdown" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-form"><i class="bi bi-pencil me-2"></i> Edit</a>
-                                        <a href="#" class="dropdown-item text-danger" onclick="deleteData();"><i class="bi bi-trash me-2"></i> Hapus</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="row">
-                            <div class="col-auto">
-                                <span class="avatar bg-warning rounded-circle"><i class="bi bi-envelope-paper h1 m-0"></i></span>
-                            </div>
-                            <div class="col">
-                                <div class="fw-bold mb-1 text-truncate">Quotation - SP2023090018</div>
-                                <div class="text-secondary fs-5 hstack gap-3">
-                                    <span><i class="bi bi-calendar-week me-1"></i> 14 September 2023</span>
-                                    <span><i class="bi bi-geo me-1"></i> PT. Citra Gemilang</span>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="fs-4 fw-bold">Harga Penawaran:</div>
-                                <div class="text-secondary fs-5">
-                                    Rp. 1.500.000.000
-                                </div>
-                            </div>
-                            <div class="col-lg-auto">
-                                <div class="dropdown">
-                                    <a href="#" class="dropdown" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a href="?page=promosi-penawaran-form" class="dropdown-item"><i class="bi bi-pencil me-2"></i> Edit</a>
-                                        <a href="#" class="dropdown-item text-danger" onclick="deleteData();"><i class="bi bi-trash me-2"></i> Hapus</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="list-group-item">
-                        <div class="row">
-                            <div class="col-auto">
-                                <span class="avatar rounded-circle"></span>
-                            </div>
-                            <div class="col">
-                                <div class="fw-bold mb-1 text-truncate">Tender</div>
-                                <div class="text-secondary fs-5 hstack gap-3">
-                                    <span><i class="bi bi-calendar-week me-1"></i> 12 September 2023</span>
-                                    <span><i class="bi bi-geo me-1"></i> PT. Citra Gemilang</span>
-                                </div>
-                            </div>
-                            <div class="col-lg-4">
-                                <div class="fs-4 fw-bold">Progres:</div>
-                                <div class="text-secondary fs-5">
-                                </div>
-                            </div>
-                            <div class="col-lg-auto">
-                                <div class="dropdown">
-                                    <a href="#" class="dropdown" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></a>
-                                    <div class="dropdown-menu dropdown-menu-end">
-                                        <a href="#" class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modal-form"><i class="bi bi-pencil me-2"></i> Edit</a>
-                                        <a href="#" class="dropdown-item text-danger" onclick="deleteData();"><i class="bi bi-trash me-2"></i> Hapus</a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <?php
+                        }
+                    } else {
+                        echo '<div class="empty">Tidak ada aktivitas.</div>';
+                    }
+                    ?>
                 </div>
             </div>
         </div>

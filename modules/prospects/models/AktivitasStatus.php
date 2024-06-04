@@ -14,6 +14,9 @@ use Yii;
  */
 class AktivitasStatus extends \yii\db\ActiveRecord
 {
+    const OPEN = 1;
+    const CLOSE = 2;
+
     /**
      * {@inheritdoc}
      */

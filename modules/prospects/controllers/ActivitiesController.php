@@ -16,6 +16,7 @@ class ActivitiesController extends FController
 {
     public $allowedRoles = [Role::ADMIN, Role::SALES];
     public $modelClass = 'app\modules\prospects\models\Aktivitas';
+    public $searchModelClass = 'app\modules\prospects\models\AktivitasSearch';
     public $title = 'Aktivitas';
 
     /**
@@ -27,8 +28,15 @@ class ActivitiesController extends FController
     {
         $lead = LeadSearch::getDetailLeadByID($leadId);
 
+        if ($lead === false) {
+            throw new \yii\web\NotFoundHttpException('Lead Not Found!');
+        }
+
+        $activities = ($this->searchModelClass)::getActivitiesByLeadID($leadId);
+
         return $this->render('view', [
-            'lead' => $lead
+            'lead' => $lead,
+            'activities' => $activities
         ]);
     }
 

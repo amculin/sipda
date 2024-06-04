@@ -2,6 +2,7 @@
 
 namespace app\modules\prospects\models;
 
+use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
 use app\modules\prospects\models\Aktivitas;
@@ -72,5 +73,19 @@ class AktivitasSearch extends Aktivitas
             ->andFilterWhere(['like', 'progres', $this->progres]);
 
         return $dataProvider;
+    }
+
+    public static function getActivitiesByLeadID($leadID)
+    {
+        $sql = 'SELECT a.id, a.tanggal, a.lokasi, a.aktivitas, a.progres, a.id_status
+            FROM aktivitas a
+            WHERE a.id_lead = :leadID AND a.is_deleted = :status';
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':leadID' => $leadID,
+            ':status' => self::IS_NOT_DELETED
+        ])->queryAll();
+
+        return $data;
     }
 }
