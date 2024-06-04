@@ -82,4 +82,37 @@ class ActivitiesController extends FController
             $model->loadDefaultValues();
         }
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+    
+                return ActiveForm::validate($model);
+            } else {
+                $data = [
+                    'model' => $model,
+                    'title' => 'Edit ' . $this->title
+                ];
+
+                if (isset($this->additionalDataClass) && array_key_exists('edit', $this->additionalDataClass)) {
+                    foreach ($this->additionalDataClass['edit'] as $key => $val) {
+                        $data[$key] = ($val)::getList();
+                    }
+                }
+
+                return $this->renderAjax('_form', $data);
+            }
+        }
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['view', 'leadId' => $model->id_lead]);
+        }
+    }
 }
