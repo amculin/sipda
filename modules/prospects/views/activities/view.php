@@ -128,8 +128,11 @@ use yii\grid\GridView;
                                             <a href="#" class="dropdown" data-bs-toggle="dropdown"><i class="bi bi-three-dots-vertical"></i></a>
                                             <div class="dropdown-menu dropdown-menu-end">
                                                 <a href="<?= Url::to(['update', 'id' => $val['id']]); ?>" class="dropdown-item modal-trigger"
-                                                    data-bs-toggle="modal" data-bs-target="#modal-form"><i class="bi bi-pencil me-2"></i> Edit</a>
-                                                <a href="#" class="dropdown-item text-danger" onclick="deleteData();"><i class="bi bi-trash me-2"></i> Hapus</a>
+                                                    data-bs-toggle="modal" data-bs-target="#modal-form"><i class="bi bi-pencil me-2"></i> Edit
+                                                </a>
+                                                <a href="<?= Url::to(['delete', 'id' => $val['id']]); ?>" class="dropdown-item text-danger delete-dialog">
+                                                    <i class="bi bi-trash me-2"></i> Hapus
+                                                </a>
                                             </div>
                                         </div>
                                     </div>

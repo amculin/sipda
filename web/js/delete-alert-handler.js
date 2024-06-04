@@ -1,4 +1,4 @@
-$('div.grid-view a.text-danger').click(function(event) {
+$('div.grid-view a.text-danger, a.delete-dialog').click(function(event) {
     event.preventDefault();
     
     var url = $(this).attr('href');
