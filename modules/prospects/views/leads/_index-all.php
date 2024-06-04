@@ -134,6 +134,7 @@ if (! is_null($stepId)) {
                         return Html::a($icon, $url, ['class' => 'text-info']);
                     },
                     'tracking' => function ($url, $model, $key) {
+                        $url = Url::to(['/prospects/lead-histories/index', 'leadId' => $model['id']], true);
                         $icon = Html::tag('i', '', [
                             'class' => 'bi bi-diagram-2',
                             'data-bs-toggle' => 'tooltip',
@@ -155,6 +156,8 @@ if (! is_null($stepId)) {
                             $title = 'Konversi';
                         }
 
+                        $url = Url::to(['/prospects/lead-histories/convert', 'leadId' => $model['id']], true);
+
                         $icon = Html::tag('i', '', [
                             'class' => $iconClass,
                             'data-bs-toggle' => 'tooltip',
@@ -162,7 +165,11 @@ if (! is_null($stepId)) {
                             'title' => $title
                         ]);
         
-                        return Html::a($icon, $url, ['class' => 'text-success modal-trigger']);
+                        return Html::a($icon, $url, [
+                            'class' => 'text-success modal-trigger',
+                            'data-bs-toggle' => 'modal',
+                            'data-bs-target' => '#modal-form'
+                        ]);
                     },
                 ],
             ],

@@ -220,4 +220,19 @@ class Lead extends \yii\db\ActiveRecord
 
         return true;
     }
+    
+    /**
+     * @inheritdoc
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert) {
+            $history = new LeadHistory();
+            $history->id_lead = $this->id;
+            $history->id_tahapan = $this->id_tahapan;
+            $history->nilai = $this->nilai;
+
+            $history->save();
+        }
+    }
 }

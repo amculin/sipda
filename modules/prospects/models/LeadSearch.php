@@ -118,4 +118,9 @@ class LeadSearch extends Lead
     {
         return 'PK' . date('Y') . '-' . str_pad($lastCounter, 5, '0', STR_PAD_LEFT);
     }
+
+    public static function getLeadByID($id)
+    {
+        return self::findOne($id);
+    }
 }
