@@ -95,7 +95,7 @@ class LeadHistoriesController extends FController
         }
     }
 
-    public function actionTracking($leadId = null)
+    public function actionTracking($leadId)
     {
         $histories = ($this->searchModelClass)::getHistoriesByLeadID($leadId);
         $event = LeadSearch::getEvent($leadId);

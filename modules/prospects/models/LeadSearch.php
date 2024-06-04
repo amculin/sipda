@@ -127,9 +127,23 @@ class LeadSearch extends Lead
     public static function getEvent($id)
     {
         $sql = 'SELECT l.id, l.id_program, p.nama, p.tanggal_mulai, p.tanggal_selesai
-        FROM `lead` l
-        RIGHT JOIN `program` p ON (p.id = l.id_program)
-        WHERE l.id = :leadID';
+            FROM `lead` l
+            RIGHT JOIN `program` p ON (p.id = l.id_program)
+            WHERE l.id = :leadID';
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':leadID' => $id
+        ])->queryOne();
+
+        return $data;
+    }
+
+    public static function getDetailLeadByID($id) {
+        $sql = 'SELECT l.id, l.nama_klien, l.nomor_telepon, l.email, l.nama_perusahaan, l.kebutuhan,
+                l.id_tahapan, p.nama AS event_name
+            FROM `lead` l
+            LEFT JOIN `program` p ON (p.id = l.id_program)
+            WHERE l.id = :leadID';
 
         $data = Yii::$app->db->createCommand($sql, [
             ':leadID' => $id

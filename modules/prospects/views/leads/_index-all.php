@@ -124,6 +124,7 @@ if (! is_null($stepId)) {
                 'template' => '{update} {activity} {tracking} {convert} {delete}',
                 'buttons' => [
                     'activity' => function ($url, $model, $key) {
+                        $url = Url::to(['/prospects/activities/view', 'leadId' => $model['id']], true);
                         $icon = Html::tag('i', '', [
                             'class' => 'bi bi-journal-text',
                             'data-bs-toggle' => 'tooltip',
