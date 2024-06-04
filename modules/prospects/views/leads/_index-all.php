@@ -134,7 +134,7 @@ if (! is_null($stepId)) {
                         return Html::a($icon, $url, ['class' => 'text-info']);
                     },
                     'tracking' => function ($url, $model, $key) {
-                        $url = Url::to(['/prospects/lead-histories/index', 'leadId' => $model['id']], true);
+                        $url = Url::to(['/prospects/lead-histories/tracking', 'leadId' => $model['id']], true);
                         $icon = Html::tag('i', '', [
                             'class' => 'bi bi-diagram-2',
                             'data-bs-toggle' => 'tooltip',
@@ -142,7 +142,12 @@ if (! is_null($stepId)) {
                             'title' => 'Tracking'
                         ]);
         
-                        return Html::a($icon, $url, ['class' => 'text-warning modal-trigger']);
+                        return Html::a($icon, $url, [
+                            'class' => 'text-warning modal-trigger',
+                            'data-bs-toggle' => 'modal',
+                            'data-bs-target' => '#modal-form',
+                            'data-bs-size' => 'lg'
+                        ]);
                     },
                     'convert' => function ($url, $model, $key) {
                         $iconClass = ($model['step'] == 'FAIL' || $model['step'] == 'DEAL') ? 'bi bi-x-circle'

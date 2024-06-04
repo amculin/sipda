@@ -94,4 +94,28 @@ class LeadHistoriesController extends FController
             $model->loadDefaultValues();
         }
     }
+
+    public function actionTracking($leadId = null)
+    {
+        $histories = ($this->searchModelClass)::getHistoriesByLeadID($leadId);
+        $event = LeadSearch::getEvent($leadId);
+
+        return $this->renderAjax('tracking', [
+            'histories' => $histories,
+            'event' => $event
+        ]);
+    }
+
+    public function actionDownload($id)
+    {
+        $model = $this->findModel($id);
+
+        $path = Yii::getAlias('@app') . '/attachments/' . $model->file;
+
+        if (file_exists($path)) {
+            return Yii::$app->response->sendFile($path, $model->file);
+        } else {
+            throw new \yii\web\NotFoundHttpException('File Not Found!');
+        }
+    }
 }

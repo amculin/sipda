@@ -123,4 +123,18 @@ class LeadSearch extends Lead
     {
         return self::findOne($id);
     }
+
+    public static function getEvent($id)
+    {
+        $sql = 'SELECT l.id, l.id_program, p.nama, p.tanggal_mulai, p.tanggal_selesai
+        FROM `lead` l
+        RIGHT JOIN `program` p ON (p.id = l.id_program)
+        WHERE l.id = :leadID';
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':leadID' => $id
+        ])->queryOne();
+
+        return $data;
+    }
 }

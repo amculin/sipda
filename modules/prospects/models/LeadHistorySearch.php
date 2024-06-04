@@ -82,4 +82,18 @@ class LeadHistorySearch extends LeadHistory
 
         return $data;
     }
+
+    public static function getHistoriesByLeadID($leadID)
+    {
+        $sql = 'SELECT h.id, t.nama, t.warna, t.icon, h.nilai, h.file, h.timestamp
+            FROM lead_history h
+            LEFT JOIN tahapan t ON (t.id = h.id_tahapan)
+            WHERE h.id_lead = :leadID';
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':leadID' => $leadID
+        ])->queryAll();
+
+        return $data;
+    }
 }
