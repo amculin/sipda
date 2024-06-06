@@ -5,6 +5,7 @@ namespace app\modules\broadcasts\controllers;
 use Yii;
 use app\customs\FController;
 use app\models\UserGrup as Role;
+use app\modules\broadcasts\models\ChannelSearch;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 
@@ -26,7 +27,7 @@ class ChannelDetailsController extends FController
         ],
     ];
     public $modelClass = 'app\modules\broadcasts\models\ChannelDetail';
-    public $searchModelClass = 'app\modules\broadcasts\models\ChannelSearch';
+    public $searchModelClass = 'app\modules\broadcasts\models\ChannelDetailSearch';
     public $title = 'Kontak';
 
     /**
@@ -83,5 +84,23 @@ class ChannelDetailsController extends FController
         } else {
             $model->loadDefaultValues();
         }
+    }
+
+    /**
+     * Lists all ChannelDetail models.
+     *
+     * @return string
+     */
+    public function actionView($channelId)
+    {
+        $searchModel = new ($this->searchModelClass)();
+        $channelData = ChannelSearch::getDetailChannelByID($channelId);
+        $dataProvider = $searchModel->search($channelId);
+
+        return $this->render('view', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+            'channelData' => $channelData
+        ]);
     }
 }

@@ -11,6 +11,7 @@ use app\modules\prospects\models\Lead;
  * @property int $id
  * @property int $id_channel
  * @property int $id_lead
+ * @property int $is_deleted
  * @property string $timestamp
  *
  * @property Channel $channel
@@ -18,6 +19,9 @@ use app\modules\prospects\models\Lead;
  */
 class ChannelDetail extends \yii\db\ActiveRecord
 {
+    const IS_DELETED = 1;
+    const IS_NOT_DELETED = 0;
+
     const SCENARIO_CREATE_FROM_LEAD = 'scenario-create-from-lead';
     const SCENARIO_CREATE = 'scenario-create';
 
@@ -39,7 +43,7 @@ class ChannelDetail extends \yii\db\ActiveRecord
         return [
             [['id_channel', 'id_lead'], 'required', 'on' => self::SCENARIO_CREATE],
             [['id_channel', 'lead_collections'], 'required', 'on' => self::SCENARIO_CREATE_FROM_LEAD],
-            [['id_channel', 'id_lead'], 'integer'],
+            [['id_channel', 'id_lead', 'is_deleted'], 'integer'],
             [['timestamp'], 'safe'],
             [['id_channel', 'id_lead'], 'unique', 'targetAttribute' => ['id_channel', 'id_lead']],
             [['id_channel'], 'exist', 'skipOnError' => true, 'targetClass' => Channel::class, 'targetAttribute' => ['id_channel' => 'id']],
@@ -56,6 +60,7 @@ class ChannelDetail extends \yii\db\ActiveRecord
             'id' => 'ID',
             'id_channel' => 'Channel',
             'id_lead' => 'Lead',
+            'is_deleted' => 'Is Deleted',
             'timestamp' => 'Timestamp',
         ];
     }

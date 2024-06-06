@@ -2,8 +2,9 @@
 
 namespace app\modules\broadcasts\models;
 
+use Yii;
 use yii\base\Model;
-use yii\data\ActiveDataProvider;
+use yii\data\SqlDataProvider;
 use app\modules\broadcasts\models\ChannelDetail;
 
 /**
@@ -38,32 +39,31 @@ class ChannelDetailSearch extends ChannelDetail
      *
      * @return ActiveDataProvider
      */
-    public function search($params)
+    public function search($channelID)
     {
-        $query = ChannelDetail::find();
+        $bound = [
+            ':status' => $this::IS_NOT_DELETED,
+            ':channelID' => $channelID
+        ];
+        $where = ' WHERE c.id_channel = :channelID AND c.is_deleted = :status';
 
-        // add conditions that should always apply here
+        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM channel_detail c' . $where, $bound)->queryScalar();
+        $sql = "SELECT c.id, l.nama_klien, l.nomor_telepon, l.email, l.nama_perusahaan
+            FROM `channel_detail` c
+            LEFT JOIN `lead` l ON (l.id = c.id_lead)
+            {$where}";
 
-        $dataProvider = new ActiveDataProvider([
-            'query' => $query,
-        ]);
+        $config = [
+            'sql' => $sql,
+            'params' => $bound,
+            'totalCount' => $count,
+            'pagination' => [
+                'pageSize' => Yii::$app->params['pageSize'],
+            ],
+        ];
 
-        $this->load($params);
+        $provider = new SqlDataProvider($config);
 
-        if (!$this->validate()) {
-            // uncomment the following line if you do not want to return any records when validation fails
-            // $query->where('0=1');
-            return $dataProvider;
-        }
-
-        // grid filtering conditions
-        $query->andFilterWhere([
-            'id' => $this->id,
-            'id_channel' => $this->id_channel,
-            'id_lead' => $this->id_lead,
-            'timestamp' => $this->timestamp,
-        ]);
-
-        return $dataProvider;
+        return $provider;
     }
 }

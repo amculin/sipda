@@ -101,4 +101,16 @@ class ChannelSearch extends Channel
 
         return ArrayHelper::map($data, 'id', 'nama');
     }
+
+    public static function getDetailChannelByID($id) {
+        $sql = 'SELECT c.nama
+            FROM channel c
+            WHERE c.id = :channelID';
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':channelID' => $id
+        ])->queryOne();
+
+        return $data;
+    }
 }
