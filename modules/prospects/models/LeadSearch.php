@@ -157,11 +157,13 @@ class LeadSearch extends Lead
         $sql = "SELECT l.id, CONCAT_WS(' - ', l.nama_klien, l.nama_perusahaan) AS `contact`
             FROM `lead` l
             WHERE l.id NOT IN (
-                SELECT cd.id_lead FROM channel_detail cd WHERE cd.id_channel = :channelID
-            )";
+                SELECT cd.id_lead FROM channel_detail cd
+                WHERE cd.id_channel = :channelID AND cd.is_deleted = :status
+            ) AND l.is_deleted = :status";
         
         $data = Yii::$app->db->createCommand($sql, [
-            ':channelID' => $id
+            ':channelID' => $id,
+            ':status' => self::IS_NOT_DELETED
         ])->queryAll();
 
         return ArrayHelper::map($data, 'id', 'contact');

@@ -61,7 +61,7 @@ class ChannelSearch extends Channel
 
         $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM channel c' . $where, $bound)->queryScalar();
         $sql = "SELECT c.id, c.nama, c.keterangan, u.nama AS sales_name,
-                (SELECT COUNT(*) FROM `channel_detail` cd WHERE cd.id_channel = c.id) AS `total`
+                (SELECT COUNT(*) FROM `channel_detail` cd WHERE cd.id_channel = c.id AND cd.is_deleted = :status) AS `total`
             FROM channel c
             LEFT JOIN user u ON (u.id = c.id_sales)
             {$where}";
