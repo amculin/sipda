@@ -22,7 +22,7 @@ class AppAsset extends AssetBundle
     public $css = [
         'css/tabler.min.css',
         'css/custom.css',
-        'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css',
+        'https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.min.css',
     ];
     public $js = [
         'js/tabler.min.js',

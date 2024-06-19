@@ -4,6 +4,7 @@ $params = require __DIR__ . '/params.php';
 $db = require __DIR__ . '/db.php';
 
 $config = [
+    'language' => 'id-ID',
     'id' => 'Aplikasi Pengadaan Barang',
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
