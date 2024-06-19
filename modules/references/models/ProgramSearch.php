@@ -5,6 +5,7 @@ namespace app\modules\references\models;
 use Yii;
 use yii\base\Model;
 use yii\data\SqlDataProvider;
+use yii\helpers\ArrayHelper;
 
 /**
  * ProgramSearch represents the model behind the search form of `app\modules\references\models\Program`.
@@ -97,5 +98,19 @@ class ProgramSearch extends Program
     {
         return 'EV' . substr(date('Y'), 2, 2)
             . date('m') . str_pad($lastCounter, 4, '0', STR_PAD_LEFT);
+    }
+
+    public static function getList()
+    {
+        $sql = "SELECT p.id, CONCAT_WS(' - ', p.kode, p.nama) AS event_name FROM `program` p
+            WHERE id_unit = :unitID AND is_deleted = :status
+            ORDER BY nama ASC";
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':unitID' => Yii::$app->user->identity->id_unit,
+            ':status' => parent::IS_NOT_DELETED
+        ])->queryAll();
+
+        return ArrayHelper::map($data, 'id', 'event_name');
     }
 }

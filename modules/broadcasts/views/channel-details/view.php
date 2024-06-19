@@ -9,8 +9,11 @@ use yii\grid\GridView;
 use yii\widgets\ActiveForm;
 
 /** @var yii\web\View $this */
-/** @var app\modules\broadcasts\models\ChannelSearch $searchModel */
+/** @var app\modules\broadcasts\models\ChannelDetailSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
+
+$this->title = 'Channel Details';
+$this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="page-wrapper" data-menu-active="Broadcast" data-submenu-active="Channel">
     <div class="container-xl">
@@ -34,25 +37,17 @@ use yii\widgets\ActiveForm;
         <div class="container-xl">
             <div class="card">
                 <div class="card-header">
-                    <a href="<?= Url::to('/broadcasts/channels/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block modal-trigger"
-                        data-bs-toggle="modal" data-bs-target="#modal-form">
+                    <a href="<?= Url::to(['/broadcasts/channels'], true); ?>" class="btn btn px-4 me-2"><i class="bi bi-arrow-left me-2"></i>Kembali</a>
+                    <a href="<?= Url::to(['/broadcasts/channel-details/create-from-channel', 'channelId' => $channelID], true); ?>" 
+                        class="btn btn-primary d-none d-sm-inline-block modal-trigger" data-bs-toggle="modal" data-bs-target="#modal-form">
                         <i class="bi bi-plus"></i>
                         Tambah Data
                     </a>
-                    <div class="ms-auto">
-                        <?php $form = ActiveForm::begin([
-                            'action' => ['index'],
-                            'method' => 'get',
-                            'options' => ['style' => 'display: contents;']
-                        ]); ?>
+                    <div class="ms-auto d-flex gap-2">
                         <div class="input-group">
-                            <?= $form->field($searchModel, 'nama', ['options' => ['tag' => false]])->textInput([
-                                'placeholder' => 'Cari data..',
-                                'tag' => false
-                            ])->label(false); ?>
-                            <?= Html::submitButton('<i class="bi bi-search"></i>', ['class' => 'btn']) ?>
+                            <label class="form-control" style="width: 100px">Channel</label>
+                            <label class="form-control" style="width: auto"><?= $channelData['nama']; ?></label>
                         </div>
-                        <?php ActiveForm::end(); ?>
                     </div>
                 </div>
                 <div class="table-responsive card-body p-0">
@@ -76,46 +71,30 @@ use yii\widgets\ActiveForm;
                                 'contentOptions' => [
                                     'class' => 'text-nowrap d-flex gap-2'
                                 ],
-                                'template' => '{update} {contact} {delete}',
-                                'buttons' => [
-                                    'contact' => function ($url, $model, $key) {
-                                        $icon = Html::tag('i', '', [
-                                            'class' => 'bi bi-people-fill',
-                                            'data-bs-toggle' => 'tooltip',
-                                            'data-bs-placement' => 'bottom',
-                                            'title' => 'Contact'
-                                        ]);
-
-                                        $url = Url::to(['/broadcasts/channel-details/view', 'channelId' => $model['id']]);
-                        
-                                        return Html::a($icon, $url, ['class' => 'text-dark']);
-                                    }
-                                ],
                             ],
                             [
-                                'header' => $searchModel->attributeLabels()['id_sales'],
+                                'header' => 'Nama Perusahaan',
                                 'value' => function ($data) {
-                                    return $data['sales_name'];
+                                    return $data['nama_perusahaan'];
                                 },
                             ],
                             [
-                                'header' => $searchModel->attributeLabels()['nama'],
+                                'header' => 'Nama Kontak',
                                 'value' => function ($data) {
-                                    return $data['nama'];
+                                    return $data['nama_klien'];
                                 },
                             ],
                             [
-                                'header' => $searchModel->attributeLabels()['keterangan'],
+                                'header' => 'Nomor HP',
                                 'value' => function ($data) {
-                                    return $data['keterangan'];
+                                    return $data['nomor_telepon'];
                                 },
                             ],
                             [
-                                'header' => 'Jumlah Kontak',
+                                'header' => 'Email',
                                 'value' => function ($data) {
-                                    return $data['total'];
+                                    return $data['email'];
                                 },
-                                'contentOptions' => ['class' => 'text-center']
                             ],
                         ],
                         'pager' => [

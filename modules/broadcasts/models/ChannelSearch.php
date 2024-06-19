@@ -6,6 +6,7 @@ use Yii;
 use app\models\UserGrup as Role;
 use yii\base\Model;
 use yii\data\SqlDataProvider;
+use yii\helpers\ArrayHelper;
 
 /**
  * ChannelSearch represents the model behind the search form of `app\modules\broadcasts\models\Channel`.
@@ -60,7 +61,7 @@ class ChannelSearch extends Channel
 
         $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM channel c' . $where, $bound)->queryScalar();
         $sql = "SELECT c.id, c.nama, c.keterangan, u.nama AS sales_name,
-                (SELECT COUNT(*) FROM `channel_detail` cd WHERE cd.id_channel = c.id) AS `total`
+                (SELECT COUNT(*) FROM `channel_detail` cd WHERE cd.id_channel = c.id AND cd.is_deleted = :status) AS `total`
             FROM channel c
             LEFT JOIN user u ON (u.id = c.id_sales)
             {$where}";
@@ -77,5 +78,39 @@ class ChannelSearch extends Channel
         $provider = new SqlDataProvider($config);
 
         return $provider;
+    }
+    
+    public static function getList()
+    {
+        $bound = [
+            ':unitID' => Yii::$app->user->identity->id_unit,
+            ':status' => parent::IS_NOT_DELETED
+        ];
+        $additionalFilter = '';
+
+        if (Yii::$app->user->identity->id_grup == Role::SALES) {
+            $additionalFilter = ' AND id_sales = :salesID';
+            $bound[':salesID'] = Yii::$app->user->identity->id;
+        }
+
+        $sql = "SELECT id, nama FROM `channel`
+            WHERE id_unit = :unitID AND is_deleted = :status{$additionalFilter}
+            ORDER BY nama ASC";
+
+        $data = Yii::$app->db->createCommand($sql, $bound)->queryAll();
+
+        return ArrayHelper::map($data, 'id', 'nama');
+    }
+
+    public static function getDetailChannelByID($id) {
+        $sql = 'SELECT c.nama
+            FROM channel c
+            WHERE c.id = :channelID';
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':channelID' => $id
+        ])->queryOne();
+
+        return $data;
     }
 }
