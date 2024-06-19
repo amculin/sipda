@@ -16,11 +16,8 @@ class ChannelDetailsController extends FController
 {
     public $allowedRoles = [Role::ADMIN, Role::SALES];
     public $additionalDataClass = [
-        'create' => [
-            'channelList' => 'app\modules\broadcasts\models\ChannelSearch',
-        ],
         'edit' => [
-            'channelList' => 'app\modules\broadcasts\models\ChannelSearch',
+            'contactList' => 'app\modules\prospects\models\LeadSearch',
         ],
         'create-from-lead' => [
             'channelList' => 'app\modules\broadcasts\models\ChannelSearch',
@@ -151,4 +148,37 @@ class ChannelDetailsController extends FController
             $model->loadDefaultValues();
         }
     }
+
+    /**
+    * @inheritdoc
+    */
+   public function actionUpdate($id)
+   {
+       $model = $this->findModel($id);
+
+       if (Yii::$app->request->isAjax) {
+           if ($model->load(Yii::$app->request->post())) {
+               Yii::$app->response->format = Response::FORMAT_JSON;
+   
+               return ActiveForm::validate($model);
+           } else {
+               $data = [
+                   'model' => $model,
+                   'title' => 'Edit ' . $this->title
+               ];
+
+               if (isset($this->additionalDataClass) && array_key_exists('edit', $this->additionalDataClass)) {
+                   foreach ($this->additionalDataClass['edit'] as $key => $val) {
+                       $data[$key] = ($val)::getContactsByChannelID($model->id_channel);
+                   }
+               }
+
+               return $this->renderAjax('_form-create-from-channel', $data);
+           }
+       }
+
+       if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+           return $this->redirect(['view', 'channelId' => $model->id_channel]);
+       }
+   }
 }
