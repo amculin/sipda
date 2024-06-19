@@ -59,7 +59,7 @@ class ChannelDetail extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'id_channel' => 'Channel',
-            'id_lead' => 'Lead',
+            'id_lead' => 'Nama Kontak',
             'is_deleted' => 'Is Deleted',
             'timestamp' => 'Timestamp',
         ];

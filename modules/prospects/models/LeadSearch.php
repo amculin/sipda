@@ -5,6 +5,7 @@ namespace app\modules\prospects\models;
 use Yii;
 use yii\base\Model;
 use yii\data\SqlDataProvider;
+use yii\helpers\ArrayHelper;
 use app\models\UserGrup as Role;
 use app\modules\prospects\models\Lead;
 
@@ -150,5 +151,19 @@ class LeadSearch extends Lead
         ])->queryOne();
 
         return $data;
+    }
+
+    public static function getContactsByChannelID($id) {
+        $sql = "SELECT l.id, CONCAT_WS(' - ', l.nama_klien, l.nama_perusahaan) AS `contact`
+            FROM `lead` l
+            WHERE l.id NOT IN (
+                SELECT cd.id_lead FROM channel_detail cd WHERE cd.id_channel = :channelID
+            )";
+        
+        $data = Yii::$app->db->createCommand($sql, [
+            ':channelID' => $id
+        ])->queryAll();
+
+        return ArrayHelper::map($data, 'id', 'contact');
     }
 }

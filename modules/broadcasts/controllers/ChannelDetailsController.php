@@ -25,6 +25,9 @@ class ChannelDetailsController extends FController
         'create-from-lead' => [
             'channelList' => 'app\modules\broadcasts\models\ChannelSearch',
         ],
+        'create-from-channel' => [
+            'contactList' => 'app\modules\prospects\models\LeadSearch',
+        ],
     ];
     public $modelClass = 'app\modules\broadcasts\models\ChannelDetail';
     public $searchModelClass = 'app\modules\broadcasts\models\ChannelDetailSearch';
@@ -100,7 +103,52 @@ class ChannelDetailsController extends FController
         return $this->render('view', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
-            'channelData' => $channelData
+            'channelData' => $channelData,
+            'channelID' => $channelId
         ]);
+    }
+
+    /**
+     * Creates a new model.
+     * If request comes in AJAX, it will render the form or do the validation.
+     * If creation is successful, the browser will be redirected to the 'index' page.
+     * @return string|\yii\web\Response
+     */
+    public function actionCreateFromChannel($channelId)
+    {
+        $model = new ($this->modelClass)();
+        $model->scenario = $model::SCENARIO_CREATE;
+        $model->id_channel = $channelId;
+
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+    
+                return ActiveForm::validate($model);
+            } else {
+                $data = [
+                    'model' => $model,
+                    'title' => 'Tambah Kontak'
+                ];
+
+                if (isset($this->additionalDataClass) && array_key_exists('create-from-channel', $this->additionalDataClass)) {
+                    foreach ($this->additionalDataClass['create-from-channel'] as $key => $val) {
+                        $data[$key] = ($val)::getContactsByChannelID($channelId);
+                    }
+                }
+
+                return $this->renderAjax('_form-create-from-channel', $data);
+            }
+        }
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'channelId' => $channelId]);
+            } else {
+                print_r($model->getErrors());
+            }
+        } else {
+            $model->loadDefaultValues();
+        }
     }
 }

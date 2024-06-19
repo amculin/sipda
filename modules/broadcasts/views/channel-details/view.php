@@ -37,9 +37,9 @@ $this->params['breadcrumbs'][] = $this->title;
         <div class="container-xl">
             <div class="card">
                 <div class="card-header">
-                    <a href="javascript:history.back(-1);" class="btn btn px-4 me-2"><i class="bi bi-arrow-left me-2"></i>Kembali</a>
-                    <a href="<?= Url::to('/broadcasts/channels/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block modal-trigger"
-                        data-bs-toggle="modal" data-bs-target="#modal-form">
+                    <a href="<?= Url::to(['/broadcasts/channels'], true); ?>" class="btn btn px-4 me-2"><i class="bi bi-arrow-left me-2"></i>Kembali</a>
+                    <a href="<?= Url::to(['/broadcasts/channel-details/create-from-channel', 'channelId' => $channelID], true); ?>" 
+                        class="btn btn-primary d-none d-sm-inline-block modal-trigger" data-bs-toggle="modal" data-bs-target="#modal-form">
                         <i class="bi bi-plus"></i>
                         Tambah Data
                     </a>
