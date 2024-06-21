@@ -14,10 +14,10 @@ class LoginAsset extends AssetBundle
     public $baseUrl = '@web';
     public $css = [
         'css/login.css',
-        'https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.css'
+        'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css'
     ];
     public $js = [
-        'https://cdn.jsdelivr.net/npm/swiper@10/swiper-bundle.min.js'
+        'https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js'
     ];
     public $depends = [
         'app\assets\AppAsset',
