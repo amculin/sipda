@@ -85,12 +85,13 @@ class UserSearch extends User
     {
         $sql = "SELECT id, nama
             FROM user
-            WHERE id_unit = :unitID AND id_grup = :roleID
+            WHERE id_unit = :unitID AND id_grup = :roleID AND is_deleted = :status
             ORDER BY nama ASC";
 
         $data = Yii::$app->db->createCommand($sql, [
             ':unitID' => Yii::$app->user->identity->id_unit,
-            ':roleID' => USerGrup::SALES
+            ':roleID' => UserGrup::SALES,
+            ':status' => self::IS_NOT_DELETED
         ])->queryAll();
 
         return ArrayHelper::map($data, 'id', 'nama');
