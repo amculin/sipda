@@ -36,7 +36,8 @@ class ActivitiesController extends FController
 
         return $this->render('view', [
             'lead' => $lead,
-            'activities' => $activities
+            'activities' => $activities,
+            'leadID' => $leadId
         ]);
     }
 

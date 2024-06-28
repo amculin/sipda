@@ -168,4 +168,17 @@ class LeadSearch extends Lead
 
         return ArrayHelper::map($data, 'id', 'contact');
     }
+
+    public static function getList() {
+        $sql = "SELECT l.id, CONCAT_WS(' - ', l.nama_klien, l.nama_perusahaan) AS `name`
+            FROM `lead` l
+            WHERE l.id_unit = :unitID AND l.is_deleted = :status";
+        
+        $data = Yii::$app->db->createCommand($sql, [
+            ':unitID' => Yii::$app->user->identity->id_unit,
+            ':status' => self::IS_NOT_DELETED
+        ])->queryAll();
+
+        return ArrayHelper::map($data, 'id', 'name');
+    }
 }

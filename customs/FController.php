@@ -26,6 +26,7 @@ class FController extends Controller
     public $modelClass;
     public $searchModelClass;
     public $title;
+    public $specialRules;
 
     /**
      * @inheritDoc
@@ -43,7 +44,11 @@ class FController extends Controller
                                 if (Yii::$app->user->isGuest) {
                                     return false;
                                 } else {
-                                    return in_array(Yii::$app->user->identity->id_grup, $this->allowedRoles);
+                                    if (isset($this->specialRules)) {
+                                        return in_array(Yii::$app->user->identity->id_grup, $this->specialRules[$action->id]);
+                                    } else {
+                                        return in_array(Yii::$app->user->identity->id_grup, $this->allowedRoles);
+                                    }
                                 }
                             }
                         ],

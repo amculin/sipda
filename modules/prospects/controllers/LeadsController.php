@@ -8,6 +8,7 @@ use app\models\UserGrup as Role;
 use app\models\UserSearch;
 use app\modules\prospects\models\LeadSearch;
 use app\modules\references\models\TahapanSearch;
+use yii\web\Response;
 
 /**
  * LeadsController implements the CRUD actions for Lead model.
@@ -54,5 +55,22 @@ class LeadsController extends FController
             'salesList' => $salesList,
             'stepId' => $stepId
         ]);
+    }
+
+    public function actionGetDetail($id)
+    {
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            $model = ($this->searchModelClass)::getLeadByID($id);
+
+            return [
+                'nama_klien' => $model['nama_klien'],
+                'nomor_telepon' =>$model['nomor_telepon'],
+                'email' => $model['email'],
+                'nama_perusahaan' => $model['nama_perusahaan'],
+                'id_tahapan' => $model['id_tahapan']
+            ];
+        }
     }
 }
