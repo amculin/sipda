@@ -178,11 +178,8 @@ $css = "
                             <tr>
                                 <td><strong>Diskon</strong></td>
                                 <td class="text-end">
-                                    <?= $form->field($model, 'diskon')->textInput([
-                                        'maxlength' => true,
-                                        'class' => 'form-control form-control-sm text-end',
-                                        'placeholder' => '0,00'
-                                    ])->label(false); ?>
+                                    <span id="summary-diskon">0</span>
+                                    <?= $form->field($model, 'diskon')->hiddenInput()->label(false); ?>
                                 </td>
                             </tr>
                             <tr>
@@ -380,6 +377,7 @@ function calculateAll() {
     $('#quotation-sub_total').val(subTotal);
 
     $('#quotation-diskon').val(totalDiscount);
+    $('#summary-diskon').text(numberFormat.format(totalDiscount));
     $('#summary-total').text(numberFormat.format(total));
 }
 ";
