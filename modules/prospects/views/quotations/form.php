@@ -222,6 +222,13 @@ $this->registerCss($css);
 
 <!-- Modal -->
 
+<div class="modal fade modal-blur users-form" id="modal-form" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
 <div class="modal fade modal-blur" id="modal-produk" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <form action="" id="form-produk" class="modal-content">
@@ -319,14 +326,23 @@ $('#insert-product-button').click(function() {
             td += '    <div class=\"text-secondary\" style=\"font-size:10px; color: #844 !important;\">';
             td += '        (Harga Jual : ' + numberFormat.format(salePrice) + ')';
             td += '    </div>';
-            td += '    <input type=\"hidden\" class=\"quotation-product-code\" name=\"Quotation[produk][' + row + '][product_code]\" value=\"' + data.kode + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-id\" name=\"Quotation[produk][' + row + '][product_id]\" value=\"' + productID + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-name\" name=\"Quotation[produk][' + row + '][product_name]\" value=\"' + data.nama + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-category\" name=\"Quotation[produk][' + row + '][product_category]\" value=\"' + data.category + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-price\" name=\"Quotation[produk][' + row + '][product_price]\" value=\"' + price + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-base-price\" name=\"Quotation[produk][' + row + '][product_base_price]\" value=\"' + salePrice + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-quantity\" name=\"Quotation[produk][' + row + '][product_quantity]\" value=\"' + quantity + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-discount\" name=\"Quotation[produk][' + row + '][product_discount]\" value=\"' + discount + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-code\" name=\"Quotation[produk][' + row + '][id]\" value=\"\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-code\" name=\"Quotation[produk][' + row + '][product_code]\" ';
+            td += '     value=\"' + data.kode + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-id\" name=\"Quotation[produk][' + row + '][product_id]\" ';
+            td += '     value=\"' + productID + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-name\" name=\"Quotation[produk][' + row + '][product_name]\" ';
+            td += '     value=\"' + data.nama + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-category\" name=\"Quotation[produk][' + row + '][product_category]\" ';
+            td += '     value=\"' + data.category + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-price\" name=\"Quotation[produk][' + row + '][product_price]\" ';
+            td += '     value=\"' + price + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-base-price\" name=\"Quotation[produk][' + row + '][product_base_price]\" ';
+            td += '     value=\"' + salePrice + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-quantity\" name=\"Quotation[produk][' + row + '][product_quantity]\" ';
+            td += '     value=\"' + quantity + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-discount\" name=\"Quotation[produk][' + row + '][product_discount]\" ';
+            td += '     value=\"' + discount + '\" />';
             td += '</td>';
             td += '<td class=\"text-end\">' + quantity +'</td>';
             td += '<td class=\"text-end\">' + numberFormat.format(price) + '</td>';
@@ -405,7 +421,6 @@ function calculateAll() {
         var quantitySelector = selector + 'input.quotation-product-quantity';
 
         var price = parseFloat($(priceSelector).val());
-        console.log(price);
         var quantity = parseFloat($(quantitySelector).val());
         subTotal = subTotal + (price * quantity);
 

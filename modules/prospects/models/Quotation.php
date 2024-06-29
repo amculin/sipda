@@ -170,8 +170,8 @@ class Quotation extends \yii\db\ActiveRecord
                 $product->kode_produk = $val['product_code'];
                 $product->nama_produk = $val['product_name'];
                 $product->nama_kategori = $val['product_category'];
-                $product->harga_jual = $val['product_price'];
-                $product->harga = $val['product_base_price'];
+                $product->harga_jual = $val['product_base_price'];
+                $product->harga = $val['product_price'];
                 $product->jumlah = $val['product_quantity'];
                 $product->diskon = $val['product_discount'];
 
