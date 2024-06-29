@@ -9,18 +9,18 @@ use yii\widgets\ActiveForm;
 /** @var yii\widgets\ActiveForm $form */
 
 $css = "
-    .input-so{
-        border: none;
-        border-bottom: 2px solid #aaa;
-    }
-        
-    body{
-        background: #fff;
-    }
-    .table-summary .form-control{
-        font-size: 14px;
-    }";
-    $this->registerCss($css);
+.input-so{
+    border: none;
+    border-bottom: 2px solid #aaa;
+}
+    
+body{
+    background: #fff;
+}
+.table-summary .form-control{
+    font-size: 14px;
+}";
+$this->registerCss($css);
 ?>
 
 <div class="page-wrapper" data-menu-active="Prospek" data-submenu-active="Quotation">
@@ -69,7 +69,7 @@ $css = "
                             </tr>
                             <tr>
                                 <td>Tanggal Quotation</td>
-                                <td class="text-end"><?= date('d/m/Y'); ?></td>
+                                <td class="text-end"><?= $model->isNewRecord ? date('d/m/Y') : date('d/m/Y', strtotime($model->tanggal)); ?></td>
                             </tr>
                         </table>
                     </div>
@@ -155,7 +155,9 @@ $css = "
                                 <th class="bg-dark text-end">Total</th>
                             </tr>
                         </thead>
-                        <tbody></tbody>
+                        <tbody>
+                            <?= !$model->isNewRecord ? $this->render('_product-form', ['model' => $model]) : ''; ?>
+                        </tbody>
                     </table>
                 </div>
                 <div class="row mt-4 justify-content-lg-end">
@@ -251,7 +253,7 @@ $css = "
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="insert-product-button" data-bs-dismiss="modal">Submit</button>
+                <button type="button" class="btn btn-primary" id="insert-product-button" data-bs-dismiss="modal">Tambah</button>
             </div>
         </form>
     </div>
@@ -308,7 +310,7 @@ $('#insert-product-button').click(function() {
             var td = '<td class=\"text-nowrap\">';
             td += '    <div class=\"hstack gap-3\">';
             td +=          '<a href=\"#\" class=\"btn-edit\"><i class=\"bi bi-pencil text-dark\"></i></a>';
-            td +=          '<a href=\"#\" class=\"btn-delete delete-dialog\"><i class=\"bi bi-trash text-danger\"></i></a>';
+            td +=          '<a href=\"#\" class=\"btn-delete\"><i class=\"bi bi-trash text-danger\"></i></a>';
             td += '    </div>';
             td += '</td>';
             td += '<td>';
@@ -317,14 +319,14 @@ $('#insert-product-button').click(function() {
             td += '    <div class=\"text-secondary\" style=\"font-size:10px; color: #844 !important;\">';
             td += '        (Harga Jual : ' + numberFormat.format(salePrice) + ')';
             td += '    </div>';
-            td += '    <input type=\"hidden\" name=\"Quotation[produk][' + row + '][product_code]\" value=\"' + data.kode + '\">';
-            td += '    <input type=\"hidden\" name=\"Quotation[produk][' + row + '][product_id]\" value=\"' + productID + '\">';
-            td += '    <input type=\"hidden\" name=\"Quotation[produk][' + row + '][product_name]\" value=\"' + data.nama + '\">';
-            td += '    <input type=\"hidden\" name=\"Quotation[produk][' + row + '][product_category]\" value=\"' + data.category + '\">';
-            td += '    <input type=\"hidden\" name=\"Quotation[produk][' + row + '][product_price]\" value=\"' + price + '\">';
-            td += '    <input type=\"hidden\" name=\"Quotation[produk][' + row + '][product_base_price]\" value=\"' + salePrice + '\">';
-            td += '    <input type=\"hidden\" name=\"Quotation[produk][' + row + '][product_quantity]\" value=\"' + quantity + '\">';
-            td += '    <input type=\"hidden\" name=\"Quotation[produk][' + row + '][product_discount]\" value=\"' + discount + '\">';
+            td += '    <input type=\"hidden\" class=\"quotation-product-code\" name=\"Quotation[produk][' + row + '][product_code]\" value=\"' + data.kode + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-id\" name=\"Quotation[produk][' + row + '][product_id]\" value=\"' + productID + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-name\" name=\"Quotation[produk][' + row + '][product_name]\" value=\"' + data.nama + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-category\" name=\"Quotation[produk][' + row + '][product_category]\" value=\"' + data.category + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-price\" name=\"Quotation[produk][' + row + '][product_price]\" value=\"' + price + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-base-price\" name=\"Quotation[produk][' + row + '][product_base_price]\" value=\"' + salePrice + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-quantity\" name=\"Quotation[produk][' + row + '][product_quantity]\" value=\"' + quantity + '\" />';
+            td += '    <input type=\"hidden\" class=\"quotation-product-discount\" name=\"Quotation[produk][' + row + '][product_discount]\" value=\"' + discount + '\" />';
             td += '</td>';
             td += '<td class=\"text-end\">' + quantity +'</td>';
             td += '<td class=\"text-end\">' + numberFormat.format(price) + '</td>';
@@ -344,9 +346,50 @@ $('#insert-product-button').click(function() {
 
 $(document).on('click', 'a[class^=\"btn-delete\"]', function(e) {
     e.preventDefault();
-    $(this).parent().parent().parent().remove();
+    var url = $(this).attr('href');
+    var parents = $(this).parent().parent().parent();
+    console.log(parents);
 
-    calculateAll();
+    Swal.fire({
+        title: 'Hapus Data',
+        text: 'Apakah anda yakin ingin menghapus data?',
+        icon: 'warning',
+        showCancelButton: true,
+        reverseButtons:true,
+        confirmButtonText: 'Ya, Hapus Data!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            if (url == '#') {
+                console.log(parents);
+                parents.remove();
+                calculateAll();
+            } else {
+                $.ajax({
+                    url : url,
+                    type : 'POST',
+                    success : function(data){
+                        if (data.code == 200) {
+                            var title = 'Sukses!';
+                            var message = 'Data Berhasil Dihapus.';
+                            var icon = 'success';
+                        } else {
+                            var title = 'Gagal!';
+                            var message = 'Data Gagal Dihapus.';
+                            var icon = 'error';
+                        }
+                        Swal.fire(
+                            title,
+                            message,
+                            icon
+                        ).then((result) => {
+                            parents.remove();
+                            calculateAll();
+                        });
+                    }
+                });
+            }
+        }
+    });
 });
 
 function calculateAll() {
@@ -357,15 +400,16 @@ function calculateAll() {
 
     for (let i = 1; i <= totalRows; i++) {
         var selector = '#table-produk tbody tr:nth-child('+ i +') td:nth-child(2) ';
-        var priceSelector = selector + 'input[name=\"Quotation[produk][' + (i-1) + '][product_price]\"]';
+        var priceSelector = selector + 'input.quotation-product-price';
 
-        var quantitySelector = selector + 'input[name=\"Quotation[produk][' + (i-1) + '][product_quantity]\"]';
+        var quantitySelector = selector + 'input.quotation-product-quantity';
 
         var price = parseFloat($(priceSelector).val());
+        console.log(price);
         var quantity = parseFloat($(quantitySelector).val());
         subTotal = subTotal + (price * quantity);
 
-        var discountSelector = selector + 'input[name=\"Quotation[produk][' + (i-1) + '][product_discount]\"]';
+        var discountSelector = selector + 'input.quotation-product-discount';
 
         var discount = parseFloat($(discountSelector).val());
         totalDiscount = totalDiscount + discount;
@@ -381,5 +425,9 @@ function calculateAll() {
     $('#summary-total').text(numberFormat.format(total));
 }
 ";
+
+if (!$model->isNewRecord) {
+    $js .= 'calculateAll()';
+}
 
 $this->registerJs($js, $this::POS_END, 'quotation-custom-handler');

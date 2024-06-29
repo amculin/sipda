@@ -2,6 +2,7 @@
 
 namespace app\modules\prospects\controllers;
 
+use Yii;
 use app\customs\FController;
 use app\models\UserGrup as Role;
 use app\modules\prospects\models\LeadSearch;
@@ -17,13 +18,9 @@ class QuotationsController extends FController
         'index' => [
             'salesList' => 'app\models\UserSearch',
         ],
-        'create' => [
-            'eventList' => 'app\modules\references\models\ProgramSearch',
-            'salesList' => 'app\models\UserSearch',
-        ],
         'edit' => [
-            'eventList' => 'app\modules\references\models\ProgramSearch',
-            'salesList' => 'app\models\UserSearch'
+            'leadList' => 'app\modules\prospects\models\LeadSearch',
+            'productList' => 'app\modules\references\models\ProdukSearch'
         ],
     ];
     public $modelClass = 'app\modules\prospects\models\Quotation';
@@ -68,5 +65,38 @@ class QuotationsController extends FController
             'leadList' => $leadList,
             'productList' => $productList
         ]);
+    }
+
+    /**
+    * @inheritdoc
+    */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+    
+                return ActiveForm::validate($model);
+            }
+        }
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+
+        $data = [
+            'model' => $model,
+            'title' => 'Edit ' . $this->title
+        ];
+
+        if (isset($this->additionalDataClass) && array_key_exists('edit', $this->additionalDataClass)) {
+            foreach ($this->additionalDataClass['edit'] as $key => $val) {
+                $data[$key] = ($val)::getList();
+            }
+        }
+
+        return $this->render('form', $data);
     }
 }

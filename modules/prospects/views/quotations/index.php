@@ -113,6 +113,16 @@ $approverRole = Role::ADMIN;
                                 ],
                                 'template' => '{update} {print} {mailer} {approver} {delete}',
                                 'buttons' => [
+                                    'update' => function ($url, $model, $key) {
+                                        $icon = Html::tag('i', '', [
+                                            'class' => 'bi bi-pencil',
+                                            'data-bs-toggle' => 'tooltip',
+                                            'data-bs-placement' => 'bottom',
+                                            'title' => 'Edit'
+                                        ]);
+                        
+                                        return Html::a($icon, $url, ['class' => 'text-dark']);
+                                    },
                                     'print' => function ($url, $model, $key) {
                                         $icon = Html::tag('i', '', [
                                             'class' => 'bi bi-printer',
