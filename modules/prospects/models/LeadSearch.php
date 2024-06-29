@@ -170,14 +170,22 @@ class LeadSearch extends Lead
     }
 
     public static function getList() {
-        $sql = "SELECT l.id, CONCAT_WS(' - ', l.nama_klien, l.nama_perusahaan) AS `name`
-            FROM `lead` l
-            WHERE l.id_unit = :unitID AND l.is_deleted = :status";
-        
-        $data = Yii::$app->db->createCommand($sql, [
+        $bound = [
             ':unitID' => Yii::$app->user->identity->id_unit,
             ':status' => self::IS_NOT_DELETED
-        ])->queryAll();
+        ];
+        $where = 'l.id_unit = :unitID AND l.is_deleted = :status';
+        
+        if ((Yii::$app->user->identity->id_grup == Role::SALES)) {
+            $salesID = Yii::$app->user->identity->id;
+            $where .= ' AND l.id_sales = :salesID';
+            $bound[':salesID'] = $salesID;
+        }
+        $sql = "SELECT l.id, CONCAT_WS(' - ', l.nama_klien, l.nama_perusahaan) AS `name`
+            FROM `lead` l
+            WHERE {$where}";
+        
+        $data = Yii::$app->db->createCommand($sql, $bound)->queryAll();
 
         return ArrayHelper::map($data, 'id', 'name');
     }

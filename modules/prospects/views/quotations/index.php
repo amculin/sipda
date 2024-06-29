@@ -12,6 +12,7 @@ use yii\widgets\ActiveForm;
 /** @var yii\web\View $this */
 /** @var app\modules\prospects\models\QuotationSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
+$approverRole = Role::ADMIN;
 ?>
 <div class="page-wrapper" data-menu-active="Prospek" data-submenu-active="Quotation">
     <div class="container-xl">
@@ -55,7 +56,7 @@ use yii\widgets\ActiveForm;
 
                         echo $form->field($searchModel, 'is_verified', ['options' => ['tag' => false]])->dropDownList([
                             1 => 'Disetujui',
-                            0 => 'Tidak Disetujui'
+                            0 => 'Ditolak'
                         ], [
                             'prompt' => 'Semua Status',
                             'class' => 'form-select',
@@ -134,15 +135,20 @@ use yii\widgets\ActiveForm;
                                     },
                                     'approver' => function ($url, $model, $key) {
                                         $icon = Html::tag('i', '', [
-                                            'class' => $model['is_verified'] == 1 ? 'bi bi-check-circle' : 'bi bi-slash-circle',
+                                            'class' => $model['is_verified'] == 1 ? 'bi bi-check-circle' : 'bi bi-x-circle',
                                             'data-bs-toggle' => 'tooltip',
                                             'data-bs-placement' => 'bottom',
-                                            'title' => $model['is_verified'] == 1 ? 'Reject' : 'Approve'
+                                            'title' => $model['is_verified'] == 1 ? 'Tolak' : 'Setujui'
                                         ]);
                         
                                         return Html::a($icon, $url, ['class' => 'text-dark quotation-approver']);
                                     },
                                 ],
+                                'visibleButtons' => [
+                                    'approver' => function ($model, $key, $index) use ($approverRole) {
+                                        return Yii::$app->user->identity->id_grup == $approverRole;
+                                    }
+                                ]
                             ],
                             [
                                 'header' => 'Nama Sales',

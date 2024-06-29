@@ -45,7 +45,11 @@ class FController extends Controller
                                     return false;
                                 } else {
                                     if (isset($this->specialRules)) {
-                                        return in_array(Yii::$app->user->identity->id_grup, $this->specialRules[$action->id]);
+                                        if (in_array($action->id, $this->specialRules)) {
+                                            return in_array(Yii::$app->user->identity->id_grup, $this->specialRules[$action->id]);
+                                        } else {
+                                            return true;
+                                        }
                                     } else {
                                         return in_array(Yii::$app->user->identity->id_grup, $this->allowedRoles);
                                     }

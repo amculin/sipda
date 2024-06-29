@@ -61,7 +61,7 @@ class QuotationSearch extends Quotation
         }
 
         if ($this->name) {
-            $where .= ' AND (q.nama_klien LIKE :name OR q.nama_perusahaan LIKE :name)';
+            $where .= ' AND (l.kebutuhan LIKE :name OR q.nama_perusahaan LIKE :name)';
             $bound[':name'] = "%{$this->name}%";
         }
 
