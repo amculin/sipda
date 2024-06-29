@@ -188,6 +188,23 @@ class Quotation extends \yii\db\ActiveRecord
             $activity->id_status = AktivitasStatus::OPEN;
 
             $activity->save();
+        } else {
+            foreach ($this->produk as $key => $val) {
+                if ($val['id'] == '') {
+                    $product = new QuotationDetail();
+                    $product->id_quotation = $this->id;
+                    $product->id_produk = $val['product_id'];
+                    $product->kode_produk = $val['product_code'];
+                    $product->nama_produk = $val['product_name'];
+                    $product->nama_kategori = $val['product_category'];
+                    $product->harga_jual = $val['product_base_price'];
+                    $product->harga = $val['product_price'];
+                    $product->jumlah = $val['product_quantity'];
+                    $product->diskon = $val['product_discount'];
+
+                    $product->save();
+                }
+            }
         }
     }
 }
