@@ -22,8 +22,8 @@ foreach ($model->quotationDetails as $key => $val) { ?>
         <div class="text-secondary" style="font-size:10px; color: #844 !important;">
             (Harga Jual : <?= number_format($val->harga_jual, 0, ",", "."); ?>)
         </div>
-        <input type="hidden" class="quotation-product-" name="Quotation[produk][<?= $i; ?>][id]" value="<?= $val->id; ?>" />
-        <input type="hidden" class="quotation-product-" name="Quotation[produk][<?= $i; ?>][product_code]" value="<?= $val->kode_produk; ?>" />
+        <input type="hidden" class="quotation-product-detail-id" name="Quotation[produk][<?= $i; ?>][id]" value="<?= $val->id; ?>" />
+        <input type="hidden" class="quotation-product-code" name="Quotation[produk][<?= $i; ?>][product_code]" value="<?= $val->kode_produk; ?>" />
         <input type="hidden" class="quotation-product-id" name="Quotation[produk][<?= $i; ?>][product_id]" value="<?= $val->id_produk; ?>" />
         <input type="hidden" class="quotation-product-name" name="Quotation[produk][<?= $i; ?>][product_name]" value="<?= $val->nama_produk; ?>" />
         <input type="hidden" class="quotation-product-category" name="Quotation[produk][<?= $i; ?>][product_category]" value="<?= $val->nama_kategori; ?>" />

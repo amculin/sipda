@@ -49,7 +49,7 @@ class QuotationSearch extends Quotation
             ':status' => $this::IS_NOT_DELETED
         ];
 
-        $where = ' WHERE l.id_unit = :unitID AND l.is_deleted = :status';
+        $where = ' WHERE l.id_unit = :unitID AND q.is_deleted = :status';
 
         $this->load($params);
 
@@ -66,8 +66,8 @@ class QuotationSearch extends Quotation
         }
 
         if ($this->is_verified) {
-            $where .= ' AND l.id_tahapan = :stepID';
-            $bound[':stepID'] = $this->is_verified;
+            $where .= ' AND q.is_verified = :isVerified';
+            $bound[':isVerified'] = $this->is_verified;
         }
 
         if ($this->year) {

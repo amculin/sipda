@@ -141,7 +141,7 @@ $this->registerCss($css);
                     </table>
                 </div>
                 <div class="mt-3">
-                    <button class="btn btn-secondary" type="button" data-bs-toggle="modal" data-bs-target="#modal-produk">Tambah Produk</button>
+                    <button class="btn btn-secondary" id="add-product-button" type="button" data-bs-toggle="modal" data-bs-target="#modal-produk">Tambah Produk</button>
                 </div>
                 <div class="mt-3 table-responsive">
                     <table class="table table-bordered" id="table-produk">
@@ -247,15 +247,17 @@ $this->registerCss($css);
                 </div>
                 <div class="mb-2">
                     <label for="" class="form-label">Kuantitas</label>
-                    <input id="product-quantity" name="kuantitas" type="text" class="form-control" style="width:100px">
+                    <input id="product-quantity" name="kuantitas" type="text" class="form-control" style="width:100px" />
                 </div>
                 <div class="mb-2">
                     <label for="" class="form-label">Harga</label>
-                    <input id="product-price" name="harga" type="text" class="form-control" style="width:200px">
+                    <input id="product-price" name="harga" type="text" class="form-control" style="width:200px" />
                 </div>
                 <div class="mb-2">
                     <label for="" class="form-label">Diskon</label>
-                    <input id="product-discount" type="text" class="form-control"  style="width:200px">
+                    <input id="product-discount" type="text" class="form-control"  style="width:200px" />
+                    <input type="hidden" id="is-edit-form" value="0" />
+                    <input type="hidden" id="row-source" value="0" />
                 </div>
             </div>
             <div class="modal-footer">
@@ -286,10 +288,17 @@ $('#quotation-id_lead').change(function(){
 });
 
 var numberFormat = new Intl.NumberFormat('id-ID');
+$('#add-product-button').click(function() {
+    $('#is-edit-form').val(0);
+    $('#row-source').val(0);
+});
 
 $('#insert-product-button').click(function() {
     var productID = $('#product-list').val();
     var url = '{$getProductUrl}' + productID;
+    var isEditForm = $('#is-edit-form').val() == 1 ? true : false;
+    var rowSource = parseInt($('#row-source').val());
+
     $.ajax({
         url : url,
         type : 'GET',
@@ -312,47 +321,68 @@ $('#insert-product-button').click(function() {
             var salePrice = parseFloat(data.harga_jual);
 
             var totalRows = $('#table-produk tbody tr').length;
-            var row = totalRows ? totalRows : 0;
+            var row = totalRows ? totalRows : rowSource;
 
-            var td = '<td class=\"text-nowrap\">';
-            td += '    <div class=\"hstack gap-3\">';
-            td +=          '<a href=\"#\" class=\"btn-edit\"><i class=\"bi bi-pencil text-dark\"></i></a>';
-            td +=          '<a href=\"#\" class=\"btn-delete\"><i class=\"bi bi-trash text-danger\"></i></a>';
-            td += '    </div>';
-            td += '</td>';
-            td += '<td>';
-            td += '    <div class=\"fw-bold\">' + data.kode + ' - ' + data.nama + '</div>';
-            td += '    <div class=\"text-secondary\">' + data.category + '</div>';
-            td += '    <div class=\"text-secondary\" style=\"font-size:10px; color: #844 !important;\">';
-            td += '        (Harga Jual : ' + numberFormat.format(salePrice) + ')';
-            td += '    </div>';
-            td += '    <input type=\"hidden\" class=\"quotation-product-code\" name=\"Quotation[produk][' + row + '][id]\" value=\"\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-code\" name=\"Quotation[produk][' + row + '][product_code]\" ';
-            td += '     value=\"' + data.kode + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-id\" name=\"Quotation[produk][' + row + '][product_id]\" ';
-            td += '     value=\"' + productID + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-name\" name=\"Quotation[produk][' + row + '][product_name]\" ';
-            td += '     value=\"' + data.nama + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-category\" name=\"Quotation[produk][' + row + '][product_category]\" ';
-            td += '     value=\"' + data.category + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-price\" name=\"Quotation[produk][' + row + '][product_price]\" ';
-            td += '     value=\"' + price + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-base-price\" name=\"Quotation[produk][' + row + '][product_base_price]\" ';
-            td += '     value=\"' + salePrice + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-quantity\" name=\"Quotation[produk][' + row + '][product_quantity]\" ';
-            td += '     value=\"' + quantity + '\" />';
-            td += '    <input type=\"hidden\" class=\"quotation-product-discount\" name=\"Quotation[produk][' + row + '][product_discount]\" ';
-            td += '     value=\"' + discount + '\" />';
-            td += '</td>';
-            td += '<td class=\"text-end\">' + quantity +'</td>';
-            td += '<td class=\"text-end\">' + numberFormat.format(price) + '</td>';
-            td += '<td class=\"text-end\">' + numberFormat.format(discount) + '</td>';
-            td += '<td class=\"text-end\">' + numberFormat.format(total) + '</td>';
+            if (!isEditForm) {
+                var td = '<td class=\"text-nowrap\">';
+                td += '    <div class=\"hstack gap-3\">';
+                td += '         <a href=\"#\" class=\"btn-edit\" data-bs-toggle=\"modal\" data-bs-target=\"#modal-produk\">';
+                td += '             <i class=\"bi bi-pencil text-dark\"></i>';
+                td += '         </a>';
+                td += '         <a href=\"#\" class=\"btn-delete\"><i class=\"bi bi-trash text-danger\"></i></a>';
+                td += '    </div>';
+                td += '</td>';
+                td += '<td>';
+                td += '    <div class=\"fw-bold\">' + data.kode + ' - ' + data.nama + '</div>';
+                td += '    <div class=\"text-secondary\">' + data.category + '</div>';
+                td += '    <div class=\"text-secondary\" style=\"font-size:10px; color: #844 !important;\">';
+                td += '        (Harga Jual : ' + numberFormat.format(salePrice) + ')';
+                td += '    </div>';
+                td += '    <input type=\"hidden\" class=\"quotation-product-detail-id\" name=\"Quotation[produk][' + row + '][id]\" value=\"\" />';
+                td += '    <input type=\"hidden\" class=\"quotation-product-code\" name=\"Quotation[produk][' + row + '][product_code]\" ';
+                td += '     value=\"' + data.kode + '\" />';
+                td += '    <input type=\"hidden\" class=\"quotation-product-id\" name=\"Quotation[produk][' + row + '][product_id]\" ';
+                td += '     value=\"' + productID + '\" />';
+                td += '    <input type=\"hidden\" class=\"quotation-product-name\" name=\"Quotation[produk][' + row + '][product_name]\" ';
+                td += '     value=\"' + data.nama + '\" />';
+                td += '    <input type=\"hidden\" class=\"quotation-product-category\" name=\"Quotation[produk][' + row + '][product_category]\" ';
+                td += '     value=\"' + data.category + '\" />';
+                td += '    <input type=\"hidden\" class=\"quotation-product-price\" name=\"Quotation[produk][' + row + '][product_price]\" ';
+                td += '     value=\"' + price + '\" />';
+                td += '    <input type=\"hidden\" class=\"quotation-product-base-price\" name=\"Quotation[produk][' + row + '][product_base_price]\" ';
+                td += '     value=\"' + salePrice + '\" />';
+                td += '    <input type=\"hidden\" class=\"quotation-product-quantity\" name=\"Quotation[produk][' + row + '][product_quantity]\" ';
+                td += '     value=\"' + quantity + '\" />';
+                td += '    <input type=\"hidden\" class=\"quotation-product-discount\" name=\"Quotation[produk][' + row + '][product_discount]\" ';
+                td += '     value=\"' + discount + '\" />';
+                td += '</td>';
+                td += '<td class=\"text-end\">' + quantity +'</td>';
+                td += '<td class=\"text-end\">' + numberFormat.format(price) + '</td>';
+                td += '<td class=\"text-end\">' + numberFormat.format(discount) + '</td>';
+                td += '<td class=\"text-end\">' + numberFormat.format(total) + '</td>';
 
-            if ($('#table-produk tbody tr').length) {
-                $('#table-produk tbody').append('<tr>' + td + '</tr>');
+                if ($('#table-produk tbody tr').length) {
+                    $('#table-produk tbody').append('<tr>' + td + '</tr>');
+                } else {
+                    $('#table-produk tbody').html('<tr>' + td + '</tr>');
+                }
             } else {
-                $('#table-produk tbody').html('<tr>' + td + '</tr>');
+                var tr = $('#table-produk tbody').find('tr:eq('+ rowSource +')');
+                tr.find('td:eq(1) div:eq(0)').text(data.kode + ' - ' + data.nama);
+                tr.find('td:eq(1) div:eq(1)').text(data.category);
+                tr.find('td:eq(1) div:eq(2)').text('(Harga Jual : ' + numberFormat.format(salePrice) + ')');
+                tr.find('td:eq(1) input.quotation-product-code').val(data.kode);
+                tr.find('td:eq(1) input.quotation-product-id').val(productID);
+                tr.find('td:eq(1) input.quotation-product-name').val(data.nama);
+                tr.find('td:eq(1) input.quotation-product-category').val(data.category);
+                tr.find('td:eq(1) input.quotation-product-price').val(price);
+                tr.find('td:eq(1) input.quotation-product-base-price').val(salePrice);
+                tr.find('td:eq(1) input.quotation-product-quantity').val(quantity);
+                tr.find('td:eq(1) input.quotation-product-discount').val(discount);
+                tr.find('td:eq(2)').text(quantity);
+                tr.find('td:eq(3)').text(numberFormat.format(price));
+                tr.find('td:eq(4)').text(numberFormat.format(discount));
+                tr.find('td:eq(5)').text(numberFormat.format(total));
             }
 
             calculateAll();
@@ -360,11 +390,30 @@ $('#insert-product-button').click(function() {
     });
 });
 
+$(document).on('click', 'a[class^=\"btn-edit\"]', function(e) {
+    e.preventDefault();
+    var url = $(this).attr('href');
+    if (url == '#') {
+        var tr = $(this).parent().parent().parent();
+        var row = tr.index();
+        var productID = tr.find('input.quotation-product-id').val();
+        var quantity = tr.find('input.quotation-product-quantity').val();
+        var price = tr.find('input.quotation-product-price').val();
+        var discount = tr.find('input.quotation-product-discount').val();
+
+        $('#product-list').val(productID);
+        $('#product-quantity').val(quantity);
+        $('#product-price').val(price);
+        $('#product-discount').val(discount);
+        $('#is-edit-form').val(1);
+        $('#row-source').val(row);
+    }
+});
+
 $(document).on('click', 'a[class^=\"btn-delete\"]', function(e) {
     e.preventDefault();
     var url = $(this).attr('href');
     var parents = $(this).parent().parent().parent();
-    console.log(parents);
 
     Swal.fire({
         title: 'Hapus Data',
@@ -376,7 +425,6 @@ $(document).on('click', 'a[class^=\"btn-delete\"]', function(e) {
     }).then((result) => {
         if (result.isConfirmed) {
             if (url == '#') {
-                console.log(parents);
                 parents.remove();
                 calculateAll();
             } else {

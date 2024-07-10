@@ -40,6 +40,12 @@ class Quotation extends \yii\db\ActiveRecord
     const IS_NOT_DELETED = 0;
     const IS_DELETED = 1;
 
+    const IS_REJECTED = 0;
+    const IS_VERIFIED = 1;
+
+    const SCENARIO_UPDATE = 'scenario-update';
+    const SCENARIO_DELETE = 'scenario-delete';
+
     public $produk;
 
     /**
@@ -57,6 +63,12 @@ class Quotation extends \yii\db\ActiveRecord
     {
         return [
             [['id_unit', 'id_lead', 'id_tahapan', 'kode', 'tanggal', 'nama_klien', 'nama_perusahaan', 'nomor_telepon', 'email', 'year', 'counter'], 'required'],
+            [
+                [
+                'id_unit', 'id_lead', 'id_tahapan', 'kode', 'tanggal', 'nama_klien', 'nama_perusahaan', 'nomor_telepon',
+                'email', 'year', 'counter'
+                ], 'required', 'on' => $this::SCENARIO_UPDATE
+            ],
             [['id_unit', 'id_lead', 'id_tahapan', 'is_verified', 'is_deleted', 'counter'], 'integer'],
             [['tanggal', 'timestamp', 'year', 'produk'], 'safe'],
             [['isi', 'penutup'], 'string'],
@@ -152,6 +164,8 @@ class Quotation extends \yii\db\ActiveRecord
             $this->counter = QuotationSearch::getLastCounter();
             $this->tanggal = date('Y-m-d');
             $this->year = date('Y');
+            $this->sub_total = is_null($this->sub_total) ? 0 : $this->sub_total;
+            $this->diskon = is_null($this->diskon) ? 0 : $this->diskon;
         }
 
         return true;
@@ -163,19 +177,21 @@ class Quotation extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes)
     {
         if ($insert) {
-            foreach ($this->produk as $key => $val) {
-                $product = new QuotationDetail();
-                $product->id_quotation = $this->id;
-                $product->id_produk = $val['product_id'];
-                $product->kode_produk = $val['product_code'];
-                $product->nama_produk = $val['product_name'];
-                $product->nama_kategori = $val['product_category'];
-                $product->harga_jual = $val['product_base_price'];
-                $product->harga = $val['product_price'];
-                $product->jumlah = $val['product_quantity'];
-                $product->diskon = $val['product_discount'];
+            if (isset($this->produk)) {
+                foreach ($this->produk as $key => $val) {
+                    $product = new QuotationDetail();
+                    $product->id_quotation = $this->id;
+                    $product->id_produk = $val['product_id'];
+                    $product->kode_produk = $val['product_code'];
+                    $product->nama_produk = $val['product_name'];
+                    $product->nama_kategori = $val['product_category'];
+                    $product->harga_jual = $val['product_base_price'];
+                    $product->harga = $val['product_price'];
+                    $product->jumlah = $val['product_quantity'];
+                    $product->diskon = $val['product_discount'];
 
-                $product->save();
+                    $product->save();
+                }
             }
 
             $activity = new Aktivitas();
@@ -189,20 +205,22 @@ class Quotation extends \yii\db\ActiveRecord
 
             $activity->save();
         } else {
-            foreach ($this->produk as $key => $val) {
-                if ($val['id'] == '') {
-                    $product = new QuotationDetail();
-                    $product->id_quotation = $this->id;
-                    $product->id_produk = $val['product_id'];
-                    $product->kode_produk = $val['product_code'];
-                    $product->nama_produk = $val['product_name'];
-                    $product->nama_kategori = $val['product_category'];
-                    $product->harga_jual = $val['product_base_price'];
-                    $product->harga = $val['product_price'];
-                    $product->jumlah = $val['product_quantity'];
-                    $product->diskon = $val['product_discount'];
+            if ($this->scenario == $this::SCENARIO_UPDATE) {
+                foreach ($this->produk as $key => $val) {
+                    if ($val['id'] == '') {
+                        $product = new QuotationDetail();
+                        $product->id_quotation = $this->id;
+                        $product->id_produk = $val['product_id'];
+                        $product->kode_produk = $val['product_code'];
+                        $product->nama_produk = $val['product_name'];
+                        $product->nama_kategori = $val['product_category'];
+                        $product->harga_jual = $val['product_base_price'];
+                        $product->harga = $val['product_price'];
+                        $product->jumlah = $val['product_quantity'];
+                        $product->diskon = $val['product_discount'];
 
-                    $product->save();
+                        $product->save();
+                    }
                 }
             }
         }

@@ -150,8 +150,10 @@ $approverRole = Role::ADMIN;
                                             'data-bs-placement' => 'bottom',
                                             'title' => $model['is_verified'] == 1 ? 'Tolak' : 'Setujui'
                                         ]);
+
+                                        $aClass = $model['is_verified'] == 1 ? 'text-success' : 'text-danger';
                         
-                                        return Html::a($icon, $url, ['class' => 'text-dark quotation-approver']);
+                                        return Html::a($icon, $url, ['class' => 'quotation-approver ' . $aClass]);
                                     },
                                 ],
                                 'visibleButtons' => [
@@ -220,16 +222,16 @@ $('#w1 a.quotation-approver').click(function(event) {
     event.preventDefault();
     
     var url = $(this).attr('href');
-    var action = ($(this).find('i').attr('data-bs-original-title') == 'Enable') ? 'Enable' : 'Disable';
+    var action = ($(this).find('i').attr('data-bs-original-title') == 'Setujui') ? 'Setujui' : 'Tolak';
     var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
 
     Swal.fire({
-        title: action + ' Event?',
+        title: action + ' Quotation?',
         text: 'Apakah anda yakin?',
         icon: 'warning',
         showCancelButton: true,
         reverseButtons:true,
-        confirmButtonText: 'Ya, ' + action + ' Event!'
+        confirmButtonText: 'Ya, ' + action + ' Quotation!'
     }).then((result) => {
         if (result.isConfirmed) {
             $.ajax({
@@ -239,11 +241,11 @@ $('#w1 a.quotation-approver').click(function(event) {
                 success : function(data){
                     if (data.code == 200) {
                         var title = 'Sukses!';
-                        var message = 'Event Berhasil Di-' + action.toLowerCase();
+                        var message = 'Quotation Berhasil Di-' + action.toLowerCase();
                         var icon = 'success';
                     } else {
                         var title = 'Gagal!';
-                        var message = 'Event Gagal Di' + action.toLowerCase();
+                        var message = 'Quotation Gagal Di' + action.toLowerCase();
                         var icon = 'error';
                     }
                     Swal.fire(

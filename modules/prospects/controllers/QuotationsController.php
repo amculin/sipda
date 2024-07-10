@@ -7,6 +7,7 @@ use app\customs\FController;
 use app\models\UserGrup as Role;
 use app\modules\prospects\models\LeadSearch;
 use app\modules\references\models\ProdukSearch;
+use yii\web\Response;
 
 /**
  * QuotationsController implements the CRUD actions for Quotation model.
@@ -26,6 +27,7 @@ class QuotationsController extends FController
     public $modelClass = 'app\modules\prospects\models\Quotation';
     public $searchModelClass = 'app\modules\prospects\models\QuotationSearch';
     public $title = 'Quotation';
+    public $specialRules = ['approver' => [Role::ADMIN]];
 
     /**
      * @inheritdoc
@@ -73,6 +75,7 @@ class QuotationsController extends FController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
+        $model->scenario = $model::SCENARIO_UPDATE;
 
         if (Yii::$app->request->isAjax) {
             if ($model->load(Yii::$app->request->post())) {
@@ -98,5 +101,34 @@ class QuotationsController extends FController
         }
 
         return $this->render('form', $data);
+    }
+
+    /**
+     * Approve/Reject an existing Quotation model.
+     * If approval/rejection is successful, the system will return success message.
+     * @param int $id ID
+     * @return Response
+     * @throws UnprocessableEntityHttpException if the action cannot be executed
+     */
+    public function actionApprover($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $model = $this->findModel($id);
+
+        if ($model->is_verified == $model::IS_VERIFIED) {
+            $model->is_verified = $model::IS_REJECTED;
+        } else {
+            $model->is_verified = $model::IS_VERIFIED;
+        }
+
+        if (! $model->save()) {
+            throw new UnprocessableEntityHttpException('Gagal');
+        }
+
+        return [
+            'code' => 200,
+            'message' => 'Sukses'
+        ];
     }
 }
