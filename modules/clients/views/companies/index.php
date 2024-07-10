@@ -1,6 +1,5 @@
 <?php
 
-use app\assets\FormModalAsset;
 use app\customs\FActionColumn;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -32,8 +31,7 @@ use yii\widgets\ActiveForm;
         <div class="container-xl">
             <div class="card">
                 <div class="card-header">
-                    <a href="<?= Url::to('/clients/companies/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block modal-trigger"
-                        data-bs-toggle="modal" data-bs-target="#modal-form">
+                    <a href="<?= Url::to('/clients/companies/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block">
                         <i class="bi bi-plus"></i>
                         Tambah Data
                     </a>
@@ -126,15 +124,3 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
 </div>
-
-
-<div class="modal fade modal-blur users-form" id="modal-form" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-        </div>
-    </div>
-</div>
-
-<?php
-FormModalAsset::register($this);
-?>

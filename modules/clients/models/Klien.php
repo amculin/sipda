@@ -5,6 +5,7 @@ namespace app\modules\clients\models;
 use Yii;
 use app\models\Unit;
 use app\models\User;
+use app\models\UserGrup as Role;
 
 /**
  * This is the model class for table "klien".
@@ -72,17 +73,17 @@ class Klien extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'id_unit' => 'Id Unit',
-            'id_sales' => 'Id Sales',
+            'id_sales' => 'Sales',
             'nama' => 'Nama Klien',
             'nama_perusahaan' => 'Nama Perusahaan',
-            'akronim' => 'Akronim',
-            'alamat' => 'Alamat',
+            'akronim' => 'Akronim Perusahaan',
+            'alamat' => 'Alamat Perusahaan',
             'nomor_telepon' => 'No. Telefon',
             'email' => 'Email',
-            'npwp' => 'Npwp',
+            'npwp' => 'NPWP',
             'akun_bank' => 'Akun Bank',
-            'siup' => 'Siup',
-            'tdp' => 'Tdp',
+            'siup' => 'SIUP',
+            'tdp' => 'TDP',
             'is_disabled' => 'Is Disabled',
             'is_deleted' => 'Is Deleted',
             'timestamp' => 'Timestamp',
@@ -117,5 +118,23 @@ class Klien extends \yii\db\ActiveRecord
     public function getUnit()
     {
         return $this->hasOne(Unit::class, ['id' => 'id_unit']);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function beforeValidate()
+    {
+        parent::beforeValidate();
+
+        if ($this->isNewRecord) {
+            $this->id_unit = Yii::$app->user->identity->id_unit;
+
+            if (Yii::$app->user->identity->id_grup == Role::SALES) {
+                $this->id_sales = Yii::$app->user->identity->id;
+            }
+        }
+
+        return true;
     }
 }
