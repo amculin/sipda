@@ -36,8 +36,8 @@ class Klien extends \yii\db\ActiveRecord
     const IS_NOT_DELETED = 0;
     const IS_DELETED = 1;
 
-    const IS_ACTIVE = 0;
-    const IS_INACTIVE = 1;
+    const IS_INACTIVE = 0;
+    const IS_ACTIVE = 1;
 
     /**
      * {@inheritdoc}

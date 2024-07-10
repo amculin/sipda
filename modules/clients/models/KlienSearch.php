@@ -56,8 +56,8 @@ class KlienSearch extends Klien
         }
 
         if ($this->is_disabled) {
-            $where .= ' AND k.is_disabled';
-            $bound[':name'] = $this->is_disabled;
+            $where .= ' AND k.is_disabled = :isDisabled';
+            $bound[':isDisabled'] = $this->is_disabled;
         }
 
         if ((Yii::$app->user->identity->id_grup == Role::SALES) || ($this->id_sales)) {
