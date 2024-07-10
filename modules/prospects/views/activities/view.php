@@ -83,7 +83,8 @@ use yii\grid\GridView;
                         <i class="bi bi-plus"></i>
                         Tambah Data
                     </a>
-                    <a href="?page=promosi-penawaran-form" class="btn btn-warning d-none d-sm-inline-block">
+                    <a href="<?= Url::to(['/prospects/quotations/create', 'leadId' => $leadID], true); ?>"
+                        class="btn btn-warning d-none d-sm-inline-block">
                         <i class="bi bi-envelope-paper"></i>
                         Buat Quotation
                     </a>

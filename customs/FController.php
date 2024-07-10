@@ -5,6 +5,7 @@ use Yii;
 use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 
@@ -26,6 +27,7 @@ class FController extends Controller
     public $modelClass;
     public $searchModelClass;
     public $title;
+    public $specialRules;
 
     /**
      * @inheritDoc
@@ -43,7 +45,15 @@ class FController extends Controller
                                 if (Yii::$app->user->isGuest) {
                                     return false;
                                 } else {
-                                    return in_array(Yii::$app->user->identity->id_grup, $this->allowedRoles);
+                                    if (isset($this->specialRules)) {
+                                        if (in_array($action->id, $this->specialRules)) {
+                                            return in_array(Yii::$app->user->identity->id_grup, $this->specialRules[$action->id]);
+                                        } else {
+                                            return true;
+                                        }
+                                    } else {
+                                        return in_array(Yii::$app->user->identity->id_grup, $this->allowedRoles);
+                                    }
                                 }
                             }
                         ],
