@@ -88,4 +88,8 @@ class AktivitasSearch extends Aktivitas
 
         return $data;
     }
+
+    public static function getActivityByQuotationID($qID) {
+        return Aktivitas::find()->where(['like', 'aktivitas', $qID])->one();
+    }
 }

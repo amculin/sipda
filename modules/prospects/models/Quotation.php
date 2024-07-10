@@ -205,7 +205,11 @@ class Quotation extends \yii\db\ActiveRecord
 
             $activity->save();
         } else {
+            $activity = AktivitasSearch::getActivityByQuotationID($this->kode);
+
             if ($this->scenario == $this::SCENARIO_UPDATE) {
+                $activity->progres = number_format(($this->sub_total - $this->diskon), 0, ',', '.');
+
                 foreach ($this->produk as $key => $val) {
                     if ($val['id'] == '') {
                         $product = new QuotationDetail();
@@ -222,7 +226,11 @@ class Quotation extends \yii\db\ActiveRecord
                         $product->save();
                     }
                 }
+            } else {
+                $activity->is_deleted = Aktivitas::IS_DELETED;
             }
+
+            $activity->save();
         }
     }
 }
