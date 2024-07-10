@@ -55,7 +55,7 @@ class KlienSearch extends Klien
             $bound[':name'] = "%{$this->nama}%";
         }
 
-        if ($this->is_disabled) {
+        if (in_array($this->is_disabled, [0, 1])) {
             $where .= ' AND k.is_disabled = :isDisabled';
             $bound[':isDisabled'] = $this->is_disabled;
         }
@@ -68,7 +68,7 @@ class KlienSearch extends Klien
         }
 
         $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM klien k' . $where, $bound)->queryScalar();
-        $sql = "SELECT k.id, k.nama, k.nama_perusahaan, k.alamat, k.nomor_telepon, k.email
+        $sql = "SELECT k.id, k.nama, k.nama_perusahaan, k.alamat, k.nomor_telepon, k.email, k.is_disabled
             FROM klien k
             {$where}";
 

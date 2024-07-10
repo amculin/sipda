@@ -80,6 +80,7 @@ use yii\widgets\ActiveForm;
                                 'contentOptions' => [
                                     'class' => 'text-nowrap d-flex gap-2'
                                 ],
+                                'template' => '{update} {enabler} {delete}',
                                 'buttons' => [
                                     'update' => function ($url, $model, $key) {
                                         $icon = Html::tag('i', '', [
@@ -90,6 +91,18 @@ use yii\widgets\ActiveForm;
                                         ]);
                         
                                         return Html::a($icon, $url, ['class' => 'text-dark']);
+                                    },
+                                    'enabler' => function ($url, $model, $key) {
+                                        $icon = Html::tag('i', '', [
+                                            'class' => $model['is_disabled'] == 1 ? 'bi bi-x-circle' : 'bi bi-check-circle',
+                                            'data-bs-toggle' => 'tooltip',
+                                            'data-bs-placement' => 'bottom',
+                                            'title' => $model['is_disabled'] == 1 ? 'Non Aktifkan' : 'Aktifkan'
+                                        ]);
+
+                                        $aClass = $model['is_disabled'] == 1 ? 'text-danger' : 'text-success';
+                        
+                                        return Html::a($icon, $url, ['class' => 'client-enabler ' . $aClass]);
                                     }
                                 ],
                             ],
@@ -136,3 +149,50 @@ use yii\widgets\ActiveForm;
         </div>
     </div>
 </div>
+<?php
+$js = "
+$('#w1 a.client-enabler').click(function(event) {
+    event.preventDefault();
+    
+    var url = $(this).attr('href');
+    var action = $(this).find('i').attr('data-bs-original-title');
+    var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
+
+    Swal.fire({
+        title: action + ' Klien?',
+        text: 'Apakah anda yakin?',
+        icon: 'warning',
+        showCancelButton: true,
+        reverseButtons:true,
+        confirmButtonText: 'Ya, ' + action + ' Klien!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url : url,
+                type : 'POST',
+                data: {_csrf : csrfToken},
+                success : function(data){
+                    if (data.code == 200) {
+                        var title = 'Sukses!';
+                        var message = 'Klien Berhasil Di' + action.toLowerCase();
+                        var icon = 'success';
+                    } else {
+                        var title = 'Gagal!';
+                        var message = 'Klien Gagal Di' + action.toLowerCase();
+                        var icon = 'error';
+                    }
+                    Swal.fire(
+                        title,
+                        message,
+                        icon
+                    ).then((result) => {
+                        location.reload();
+                    });
+                }
+            });
+        }
+    })
+});
+";
+
+$this->registerJs($js, $this::POS_END, 'client-enabler-handler');
