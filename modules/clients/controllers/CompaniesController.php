@@ -58,4 +58,42 @@ class CompaniesController extends FController
 
         return $this->render('form', $data);
     }
+
+    /**
+     * Updates an existing model.
+     * If update is successful, the browser will be redirected to the 'index' page.
+     * @param int $id ID
+     * @return string|\yii\web\Response
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+    
+                return ActiveForm::validate($model);
+            }
+        }
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+
+        $isAdmin = Yii::$app->user->identity->id_grup == Role::ADMIN;
+
+        $data = [
+            'model' => $model,
+            'isAdmin' => $isAdmin
+        ];
+
+
+        if ($isAdmin) {
+            $data['salesList'] = UserSearch::getList();
+        }
+
+        return $this->render('form', $data);
+    }
 }

@@ -106,7 +106,7 @@ use yii\widgets\ActiveForm;
                 </div>
 
                 <div class="mt-3 d-flex gap-2 justify-content-between">
-                    <a href="<?= Url::to('/companies/clients/index', true); ?>" class="btn btn px-4">
+                    <a href="<?= Url::to('/clients/companies/index', true); ?>" class="btn btn px-4">
                         <i class="bi bi-arrow-left me-2"></i>Kembali
                     </a>
                     <button class="btn btn-primary px-4" type="submit">Simpan</button>

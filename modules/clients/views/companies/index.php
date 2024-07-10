@@ -80,6 +80,18 @@ use yii\widgets\ActiveForm;
                                 'contentOptions' => [
                                     'class' => 'text-nowrap d-flex gap-2'
                                 ],
+                                'buttons' => [
+                                    'update' => function ($url, $model, $key) {
+                                        $icon = Html::tag('i', '', [
+                                            'class' => 'bi bi-pencil',
+                                            'data-bs-toggle' => 'tooltip',
+                                            'data-bs-placement' => 'bottom',
+                                            'title' => 'Edit'
+                                        ]);
+                        
+                                        return Html::a($icon, $url, ['class' => 'text-dark']);
+                                    }
+                                ],
                             ],
                             [
                                 'header' => $searchModel->attributeLabels()['nama'],
