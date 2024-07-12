@@ -38,4 +38,36 @@ class ContactsController extends FController
             'clientID' => $clientId
         ]);
     }
+    /**
+     * @inheritdoc
+     */
+    public function actionCreate()
+    {
+        $model = new ($this->modelClass)();
+
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+    
+                return ActiveForm::validate($model);
+            } else {
+                $data = [
+                    'model' => $model,
+                    'title' => 'Tambah ' . $this->title
+                ];
+
+                return $this->renderAjax('_form', $data);
+            }
+        }
+
+        if ($this->request->isPost) {
+            if ($model->load($this->request->post()) && $model->save()) {
+                return $this->redirect(['view', 'clientId' => $model->id_klien]);
+            } else {
+                print_r($model->getErrors());
+            }
+        } else {
+            $model->loadDefaultValues();
+        }
+    }
 }

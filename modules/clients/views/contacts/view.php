@@ -1,5 +1,6 @@
 <?php
 
+use app\assets\FormModalAsset;
 use app\customs\FActionColumn;
 use yii\helpers\Html;
 use yii\helpers\Url;
@@ -59,9 +60,8 @@ use yii\grid\GridView;
 
             <div class="card mt-3">
                 <div class="card-header">
-                    <a href="#" class="btn btn-primary d-none d-sm-inline-block" data-bs-toggle="modal" data-bs-target="#modal-form">
-                        <i class="bi bi-plus"></i>
-                        Tambah Data
+                    <a href="<?= Url::to(['create'], true); ?>" data-client-id="<?= $clientID; ?>" class="btn btn-primary d-none d-sm-inline-block modal-trigger"
+                        data-bs-toggle="modal" data-bs-target="#modal-form"><i class="bi bi-plus"></i> Tambah Data
                     </a>
                 </div>
                 <div class="table-responsive card-body p-0">
@@ -139,36 +139,14 @@ use yii\grid\GridView;
     </div>
 </div>
 
-<!-- Modal -->
-<div class="modal fade modal-blur" id="modal-form" tabindex="-1">
+
+<div class="modal fade modal-blur users-form" id="modal-form" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Form Contact Person</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="mb-2">
-                    <label for="" class="form-label">Nama</label>
-                    <input type="text" class="form-control">
-                </div>
-                <div class="mb-2">
-                    <label for="" class="form-label">Posisi</label>
-                    <input type="text" class="form-control">
-                </div>
-                <div class="mb-2">
-                    <label for="" class="form-label">Nomor HP</label>
-                    <input type="text" class="form-control">
-                </div>
-                <div class="mb-2">
-                    <label for="" class="form-label">Email</label>
-                    <input type="email" class="form-control">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Submit</button>
-            </div>
         </div>
     </div>
 </div>
+
+<?php
+FormModalAsset::register($this);
+?>
