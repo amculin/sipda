@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use app\modules\broadcasts\models\BroadcastConfig;
 use app\modules\sales\models\Plan;
 
 /**
@@ -192,7 +193,7 @@ class User extends \yii\db\ActiveRecord
     public function afterSave($insert, $changedAttributes)
     {
         if ($insert) {
-            if ($this->id_grup != 1) {
+            if ($this->id_grup != UserGrup::ADMIN) {
                 $plan = new Plan();
                 $plan->id_unit = $this->id_unit;
                 $plan->id_sales = $this->id;
@@ -200,10 +201,22 @@ class User extends \yii\db\ActiveRecord
                 $plan->target_penjualan = 0;
                 $plan->target_komisi = 0;
                 $plan->save();
+
+                $config = new BroadcastConfig();
+                $config->id_unit = $this->id_unit;
+                $config->id_sales = $this->id;
+                $config->greeting = "Kepada Yth. {nama}\ndi {nama_perusahaan}";
+                $config->closing = "Kind Regards.";
+                $config->save();
             }
         } else {
             if ($this->scenario == $this::SCENARIO_SOFT_DELETION) {
                 Yii::$app->db->createCommand('UPDATE plan SET is_deleted = :status WHERE id_sales = :user_id', [
+                    ':status' => $this::IS_DELETED,
+                    ':user_id' => $this->id
+                ])->execute();
+
+                Yii::$app->db->createCommand('UPDATE broadcast_config SET is_deleted = :status WHERE id_sales = :user_id', [
                     ':status' => $this::IS_DELETED,
                     ':user_id' => $this->id
                 ])->execute();

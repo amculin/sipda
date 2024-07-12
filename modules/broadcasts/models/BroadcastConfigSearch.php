@@ -52,16 +52,14 @@ class BroadcastConfigSearch extends BroadcastConfig
         $this->load($params);
 
         if ($this->name) {
-            $where .= ' AND (bc.nama LIKE :name)';
+            $where .= ' AND (u.nama LIKE :name)';
             $bound[':name'] = "%{$this->name}%";
         }
 
-        if (Yii::$app->user->identity->id_grup == Role::SALES) {
-            $where .= ' AND bc.id_sales = :salesID';
-            $bound[':salesID'] = Yii::$app->user->identity->id;
-        }
-
-        $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM broadcast_config bc' . $where, $bound)->queryScalar();
+        $count = Yii::$app->db->createCommand('SELECT COUNT(*)
+            FROM broadcast_config bc
+            LEFT JOIN user u ON (u.id = bc.id_sales)'
+            . $where, $bound)->queryScalar();
         $sql = "SELECT bc.id, u.id AS sales_id, u.nama
             FROM broadcast_config bc
             LEFT JOIN user u ON (u.id = bc.id_sales)
