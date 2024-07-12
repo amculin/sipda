@@ -25,6 +25,8 @@ class BroadcastConfig extends \yii\db\ActiveRecord
     const IS_DELETED = 1;
     const IS_NOT_DELETED = 0;
 
+    public $file;
+
     /**
      * {@inheritdoc}
      */
@@ -43,6 +45,7 @@ class BroadcastConfig extends \yii\db\ActiveRecord
             [['id_unit', 'id_sales', 'is_deleted'], 'integer'],
             [['greeting', 'closing'], 'string', 'max' => 512],
             [['signature'], 'string', 'max' => 128],
+            [['file'], 'file', 'skipOnEmpty' => true, 'extensions' => 'jpg, jpeg, png, gif, bmp'],
             [['id_sales'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['id_sales' => 'id']],
             [['id_unit'], 'exist', 'skipOnError' => true, 'targetClass' => Unit::class, 'targetAttribute' => ['id_unit' => 'id']],
         ];
@@ -82,5 +85,19 @@ class BroadcastConfig extends \yii\db\ActiveRecord
     public function getUnit()
     {
         return $this->hasOne(Unit::class, ['id' => 'id_unit']);
+    }
+    
+    public function upload()
+    {
+        if ($this->validate()) {
+            if ($this->file) {
+                $this->signature = md5($this->file->baseName) . '_' . str_pad($this->id_sales, 5, '0', STR_PAD_LEFT)
+                    . '_' . time() . '.' . $this->file->extension;
+                $this->file->saveAs(Yii::getAlias('@app/signatures/' . $this->signature), false);
+            }
+            return true;
+        } else {
+            return false;
+        }
     }
 }
