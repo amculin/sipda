@@ -70,4 +70,33 @@ class ContactsController extends FController
             $model->loadDefaultValues();
         }
     }
+
+    /**
+     * Activate/Disable an existing KlienKontak model.
+     * If activation/disabling is successful, the system will return success message.
+     * @param int $id ID
+     * @return Response
+     * @throws UnprocessableEntityHttpException if the action cannot be executed
+     */
+    public function actionEnabler($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $model = $this->findModel($id);
+
+        if ($model->is_disabled == $model::IS_ACTIVE) {
+            $model->is_disabled = $model::IS_INACTIVE;
+        } else {
+            $model->is_disabled = $model::IS_ACTIVE;
+        }
+
+        if (! $model->save()) {
+            throw new UnprocessableEntityHttpException('Gagal');
+        }
+
+        return [
+            'code' => 200,
+            'message' => 'Sukses'
+        ];
+    }
 }

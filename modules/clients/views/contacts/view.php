@@ -97,7 +97,7 @@ use yii\grid\GridView;
 
                                         $aClass = $model['is_disabled'] == 1 ? 'text-danger' : 'text-success';
                         
-                                        return Html::a($icon, $url, ['class' => 'client-enabler ' . $aClass]);
+                                        return Html::a($icon, $url, ['class' => 'contact-enabler ' . $aClass]);
                                     }
                                 ],
                             ],
@@ -149,4 +149,49 @@ use yii\grid\GridView;
 
 <?php
 FormModalAsset::register($this);
-?>
+$js = "
+$('#w0 a.contact-enabler').click(function(event) {
+    event.preventDefault();
+    
+    var url = $(this).attr('href');
+    var action = $(this).find('i').attr('data-bs-original-title');
+    var csrfToken = $('meta[name=\"csrf-token\"]').attr('content');
+
+    Swal.fire({
+        title: action + ' Kontak?',
+        text: 'Apakah anda yakin?',
+        icon: 'warning',
+        showCancelButton: true,
+        reverseButtons:true,
+        confirmButtonText: 'Ya, ' + action + ' Kontak!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+                url : url,
+                type : 'POST',
+                data: {_csrf : csrfToken},
+                success : function(data){
+                    if (data.code == 200) {
+                        var title = 'Sukses!';
+                        var message = 'Kontak Berhasil Di' + action.toLowerCase();
+                        var icon = 'success';
+                    } else {
+                        var title = 'Gagal!';
+                        var message = 'Kontak Gagal Di' + action.toLowerCase();
+                        var icon = 'error';
+                    }
+                    Swal.fire(
+                        title,
+                        message,
+                        icon
+                    ).then((result) => {
+                        location.reload();
+                    });
+                }
+            });
+        }
+    })
+});
+";
+
+$this->registerJs($js, $this::POS_END, 'client-enabler-handler');
