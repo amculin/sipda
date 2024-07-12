@@ -55,7 +55,7 @@ class KlienSearch extends Klien
             $bound[':name'] = "%{$this->nama}%";
         }
 
-        if (in_array($this->is_disabled, [0, 1])) {
+        if (in_array($this->is_disabled, [0, 1]) && !is_null($this->is_disabled)) {
             $where .= ' AND k.is_disabled = :isDisabled';
             $bound[':isDisabled'] = $this->is_disabled;
         }
@@ -92,5 +92,18 @@ class KlienSearch extends Klien
             parent::IS_ACTIVE => 'Aktif',
             parent::IS_INACTIVE => 'Non Aktif'
         ];
+    }
+
+    public static function getDetailClientByID($id)
+    {
+        $sql = 'SELECT c.nama, c.nama_perusahaan, c.nomor_telepon, c.email
+            FROM klien c
+            WHERE c.id = :id';
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':id' => $id
+        ])->queryOne();
+
+        return $data;
     }
 }

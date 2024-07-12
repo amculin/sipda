@@ -80,7 +80,7 @@ use yii\widgets\ActiveForm;
                                 'contentOptions' => [
                                     'class' => 'text-nowrap d-flex gap-2'
                                 ],
-                                'template' => '{update} {enabler} {delete}',
+                                'template' => '{update} {contact} {enabler} {delete}',
                                 'buttons' => [
                                     'update' => function ($url, $model, $key) {
                                         $icon = Html::tag('i', '', [
@@ -89,6 +89,18 @@ use yii\widgets\ActiveForm;
                                             'data-bs-placement' => 'bottom',
                                             'title' => 'Edit'
                                         ]);
+                        
+                                        return Html::a($icon, $url, ['class' => 'text-dark']);
+                                    },
+                                    'contact' => function ($url, $model, $key) {
+                                        $icon = Html::tag('i', '', [
+                                            'class' => 'bi bi-people',
+                                            'data-bs-toggle' => 'tooltip',
+                                            'data-bs-placement' => 'bottom',
+                                            'title' => 'Contact Person'
+                                        ]);
+
+                                        $url = Url::to(['/clients/contacts/view', 'clientId' => $model['id']], true);
                         
                                         return Html::a($icon, $url, ['class' => 'text-dark']);
                                     },
