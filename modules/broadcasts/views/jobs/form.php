@@ -60,9 +60,8 @@ use yii\widgets\ActiveForm;
                                     'cols' => 30, 'rows' => 3
                                 ])->label(null, ['class' => 'form-label']);
 
-                                echo $form->field($model, 'isi', ['options' => ['class' => 'mb-2 col-12']])->textArea([
-                                    'cols' => 30, 'rows' => 8
-                                ])->label(null, ['class' => 'form-label']);
+                                echo '<div id="quill-content" style="height: 200px"></div>';
+                                echo $form->field($model, 'isi')->hiddenInput()->label(false);
 
                                 echo $form->field($model, 'closing', ['options' => ['class' => 'mb-2 col-12']])->textArea([
                                     'cols' => 30, 'rows' => 3
@@ -115,13 +114,25 @@ $js = "
         ['clean']         
     ];
 
-    var isi = new Quill('#broadcast-isi', {
+    var quill = new Quill('#quill-content', {
         theme: 'snow',
         modules: {
             toolbar: toolbarOptions
         }
     });
+
+    quill.on('text-change', (delta, oldDelta, source) => {
+        var content = JSON.stringify(quill.getContents());
+
+        $('#broadcast-isi').val(content);
+    });
 ";
+
+if (! $model->isNewRecord) {
+    $js .= "
+        quill.setContents({$model->isi});
+    ";
+}
 
 if (Yii::$app->user->identity->id_grup == Role::ADMIN) {
     $getConfigUrl = Url::to(['/broadcasts/configuration/get-config', 'salesId' => '']);

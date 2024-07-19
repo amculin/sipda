@@ -121,7 +121,17 @@ use yii\widgets\ActiveForm;
                                         $url = Url::to(['view', 'id' => $model['id']]);
                         
                                         return Html::a($icon, $url, ['class' => 'text-dark']);
-                                    }
+                                    },
+                                    'update' => function ($url, $model, $key) {
+                                        $icon = Html::tag('i', '', [
+                                            'class' => 'bi bi-pencil',
+                                            'data-bs-toggle' => 'tooltip',
+                                            'data-bs-placement' => 'bottom',
+                                            'title' => 'Edit'
+                                        ]);
+                        
+                                        return Html::a($icon, $url, ['class' => 'text-dark']);
+                                    },
                                 ],
                             ],
                             [

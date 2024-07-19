@@ -59,10 +59,6 @@ class JobsController extends FController
         }
 
         if ($this->request->isPost && $model->load($this->request->post())) {
-            /* echo '<pre>';
-            print_r($_POST);
-            print_r($model);
-            exit(); */
             $model->file = UploadedFile::getInstance($model, 'file');
 
             if ($model->upload() && $model->save()) {
@@ -97,7 +93,7 @@ class JobsController extends FController
 
     /**
      * Updates an existing Broadcast model.
-     * If update is successful, the browser will be redirected to the 'view' page.
+     * If update is successful, the browser will be redirected to the 'index' page.
      * @param int $id ID
      * @return string|\yii\web\Response
      * @throws NotFoundHttpException if the model cannot be found
@@ -106,12 +102,44 @@ class JobsController extends FController
     {
         $model = $this->findModel($id);
 
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isAjax) {
+            if ($model->load(Yii::$app->request->post())) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+    
+                return ActiveForm::validate($model);
+            }
         }
 
-        return $this->render('update', [
-            'model' => $model,
-        ]);
+        if ($this->request->isPost && $model->load($this->request->post())) {
+            $model->file = UploadedFile::getInstance($model, 'file');
+
+            if ($model->upload() && $model->save()) {
+                return $this->redirect(['index']);
+            }
+        } else {
+            $model->loadDefaultValues();
+        }
+
+        $data = [];
+        
+        if (isset($this->additionalDataClass) && array_key_exists('create', $this->additionalDataClass)) {
+            foreach ($this->additionalDataClass['create'] as $key => $val) {
+                $data[$key] = ($val)::getList();
+            }
+        }
+
+        if (Yii::$app->user->identity->id_grup == Role::SALES) {
+            $config = BroadcastConfig::find(['id_sales' => Yii::$app->user->identity->id])->one();
+
+            if ($config) {
+                $model->greeting = $config->greeting;
+                $model->closing = $config->closing;
+            }
+        }
+
+        $data['model'] = $model;
+        $data['title'] = 'Form Broadcast Email';
+
+        return $this->render('form', $data);
     }
 }
