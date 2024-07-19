@@ -53,9 +53,15 @@ class BroadcastSearch extends Broadcast
 
         $this->load($params);
 
-        if ($this->year && $this->month) {
+        if ($this->year) {
+            $month = '';
+
+            if ($this->month) {
+                $month = '-' . $this->month;
+            }
+
             $where .= ' AND b.timestamp LIKE :yearMonth';
-            $bound[':yearMonth'] = "%{$this->year}-{$this->month}%";
+            $bound[':yearMonth'] = "%{$this->year}{$month}%";
         }
 
         if ($this->judul) {
