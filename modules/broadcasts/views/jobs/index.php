@@ -108,21 +108,21 @@ use yii\widgets\ActiveForm;
                                 'contentOptions' => [
                                     'class' => 'text-nowrap d-flex gap-2'
                                 ],
-                                'template' => '{update} {delete}',
-                                /* 'buttons' => [
-                                    'contact' => function ($url, $model, $key) {
+                                'template' => '{update} {preview} {delete}',
+                                'buttons' => [
+                                    'preview' => function ($url, $model, $key) {
                                         $icon = Html::tag('i', '', [
-                                            'class' => 'bi bi-people-fill',
+                                            'class' => 'bi bi-view-list',
                                             'data-bs-toggle' => 'tooltip',
                                             'data-bs-placement' => 'bottom',
-                                            'title' => 'Contact'
+                                            'title' => 'Preview Email'
                                         ]);
 
-                                        $url = Url::to(['/broadcasts/channel-details/view', 'channelId' => $model['id']]);
+                                        $url = Url::to(['view', 'id' => $model['id']]);
                         
                                         return Html::a($icon, $url, ['class' => 'text-dark']);
                                     }
-                                ], */
+                                ],
                             ],
                             [
                                 'header' => 'Broadcast',
@@ -175,14 +175,23 @@ use yii\widgets\ActiveForm;
                                 'header' => 'Scheduled Send',
                                 'value' => function ($data) {
                                     return is_null($data['schedule']) ? '-'
-                                        : date('d/m/Y', strtotime($data['schedule']));
+                                        : date('d/m/Y H:i', strtotime($data['schedule']));
                                 },
                             ],
                             [
                                 'header' => 'Status',
                                 'value' => function ($data) {
-                                    return $data['status'];
+                                    $aContent = Status::isSent($data['id_status']) ? '<i class="bi bi-send me-2"></i> ' : '';
+                                    $aContent .= $data['status'];
+                                    $aClass = 'btn btn-sm rounded-pill px-3 btn-outline-';
+                                    $aClass .= Status::isSent($data['id_status']) ? 'success' : 'default';
+
+                                    return Html::a($aContent, '#', ['class' => $aClass]);
                                 },
+                                'format' => 'html',
+                                'contentOptions' => [
+                                    'class' => 'text-center'
+                                ],
                             ],
                         ],
                         'pager' => [

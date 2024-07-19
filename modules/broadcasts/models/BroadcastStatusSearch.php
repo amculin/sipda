@@ -70,4 +70,9 @@ class BroadcastStatusSearch extends Status
     {
         return $status == Status::IS_CREATED;
     }
+
+    public static function isSent($status)
+    {
+        return $status == Status::IS_SENT;
+    }
 }
