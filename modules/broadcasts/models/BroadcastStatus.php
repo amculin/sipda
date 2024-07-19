@@ -15,6 +15,10 @@ use Yii;
  */
 class BroadcastStatus extends \yii\db\ActiveRecord
 {
+    const IS_CREATED = 1;
+    const IS_SENT = 2;
+    const IS_ON_PROGRESS = 3;
+
     /**
      * {@inheritdoc}
      */

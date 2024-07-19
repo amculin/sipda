@@ -91,4 +91,26 @@ class BroadcastSearch extends Broadcast
 
         return $provider;
     }
+
+    public static function getLastCounter()
+    {
+        $year = date('Y');
+        $sql = "SELECT b.counter
+            FROM broadcast b
+            WHERE b.timestamp LIKE :year
+            ORDER BY id DESC
+            LIMIT 1";
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':year' => "%{$year}%"
+        ])->queryScalar();
+
+        return ($data === false) ? 1 : ($data + 1);
+    }
+
+    public static function createUniqueCode($lastCounter)
+    {
+        return 'BE' . substr(date('Y'), 2, 2)
+            . date('m') . str_pad($lastCounter, 4, '0', STR_PAD_LEFT);
+    }
 }

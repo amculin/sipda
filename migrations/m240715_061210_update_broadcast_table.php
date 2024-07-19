@@ -20,6 +20,7 @@ class m240715_061210_update_broadcast_table extends Migration
         $this->execute("ALTER TABLE `broadcast` ADD INDEX(`id_channel`)");
         $this->execute("ALTER TABLE `broadcast` ADD CONSTRAINT `fk-broadcast-to-channel` FOREIGN KEY (`id_channel`)
             REFERENCES `channel`(`id`) ON DELETE RESTRICT ON UPDATE RESTRICT");
+        $this->execute("ALTER TABLE `broadcast` ADD `counter` SMALLINT UNSIGNED NOT NULL AFTER `id_status`");
     }
 
     /**
@@ -27,6 +28,7 @@ class m240715_061210_update_broadcast_table extends Migration
      */
     public function safeDown()
     {
+        $this->dropColumn('broadcast', 'counter');
         $this->execute("ALTER TABLE `broadcast` DROP FOREIGN KEY `fk-broadcast-to-unit`");
         $this->dropColumn('broadcast', 'id_unit');
         $this->execute("ALTER TABLE `broadcast` DROP FOREIGN KEY `fk-broadcast-to-channel`");

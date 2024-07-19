@@ -49,4 +49,23 @@ class ConfigurationController extends FController
             }
         }
     }
+
+    /**
+     * Get configuratio data by sales ID
+     * @param int $salesID salesID
+     * @return Array
+     * @throws NotFoundHttpException if data not found
+     */
+    public function actionGetConfig($salesId)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $model = ($this->searchModelClass)::getConfigBySalesID($salesId);
+
+        if (! $model) {
+            throw new NotFoundHttpException('Data tidak ditemukan');
+        }
+
+        return $model;
+    }
 }

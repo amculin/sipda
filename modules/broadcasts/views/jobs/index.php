@@ -33,8 +33,7 @@ use yii\widgets\ActiveForm;
         <div class="container-xl">
             <div class="card">
                 <div class="card-header">
-                    <a href="<?= Url::to('/broadcasts/jobs/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block"
-                        data-bs-toggle="modal" data-bs-target="#modal-form">
+                    <a href="<?= Url::to('/broadcasts/jobs/create', true); ?>" class="btn btn-primary d-none d-sm-inline-block">
                         <i class="bi bi-plus"></i>
                         Tambah Data
                     </a>
@@ -135,11 +134,12 @@ use yii\widgets\ActiveForm;
                                         $content = 'Resend';
                                         $aClass = 'btn-outline-secondary';
                                     }
-                                    $url = Url::to(['/run', 'id' => $data['id']], true);
+                                    $url = Url::to(['run', 'id' => $data['id']], true);
                                     $aClass .= ' btn btn-sm rounded-pill px-3';
 
                                     return Html::a('<i class="bi bi-send me-2"></i> ' . $content, $url, ['class' => $aClass]);
                                 },
+                                'format' => 'html'
                             ],
                             [
                                 'header' => 'Nama Sales',
