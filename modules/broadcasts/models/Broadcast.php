@@ -54,9 +54,9 @@ class Broadcast extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_unit', 'id_sales', 'kode', 'id_channel', 'judul', 'isi', 'id_status'], 'required'],
+            [['id_unit', 'id_sales', 'kode', 'id_channel', 'judul', 'isi', 'isi_html', 'id_status'], 'required'],
             [['id_unit', 'id_sales', 'id_channel', 'id_status', 'is_deleted'], 'integer'],
-            [['isi', 'scheduled_date', 'scheduled_time'], 'string'],
+            [['isi', 'isi_html', 'scheduled_date', 'scheduled_time'], 'string'],
             [['schedule', 'timestamp'], 'safe'],
             [['kode'], 'string', 'max' => 64],
             [['judul', 'lampiran'], 'string', 'max' => 256],

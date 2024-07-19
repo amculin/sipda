@@ -62,6 +62,7 @@ use yii\widgets\ActiveForm;
 
                                 echo '<div id="quill-content" style="height: 200px"></div>';
                                 echo $form->field($model, 'isi')->hiddenInput()->label(false);
+                                echo $form->field($model, 'isi_html')->hiddenInput()->label(false);
 
                                 echo $form->field($model, 'closing', ['options' => ['class' => 'mb-2 col-12']])->textArea([
                                     'cols' => 30, 'rows' => 3
@@ -123,8 +124,10 @@ $js = "
 
     quill.on('text-change', (delta, oldDelta, source) => {
         var content = JSON.stringify(quill.getContents());
+        var html = quill.getSemanticHTML();
 
         $('#broadcast-isi').val(content);
+        $('#broadcast-isi_html').val(html);
     });
 ";
 
