@@ -39,6 +39,7 @@ class Broadcast extends \yii\db\ActiveRecord
     public $file;
     public $scheduled_date;
     public $scheduled_time;
+    public $is_scheduled = false;
 
     /**
      * {@inheritdoc}
@@ -177,10 +178,40 @@ class Broadcast extends \yii\db\ActiveRecord
             $this->id_status = BroadcastStatus::IS_CREATED;
 
             if ($this->scheduled_date && $this->scheduled_time) {
+                $this->is_scheduled = true;
                 $this->schedule = date('Y-m-d H:i:s', strtotime($this->scheduled_date . ' ' . $this->scheduled_time));
             }
         }
 
         return true;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function afterSave($insert, $changedAttributes)
+    {
+        if ($insert && $this->is_scheduled) {
+            $contacts = ChannelDetailSearch::getContactByChannel($this->id_channel);
+
+            if ($contacts) {
+                foreach($contacts as $key => $val) {
+                    $job = new BroadcastJobs();
+                    $job->id_broadcast = $this->id;
+                    $job->destination = $val['email'];
+                    $job->subject = $this->judul;
+                    $job->content = str_replace(
+                        ['{nama}', '{nama_perusahaan}'],
+                        [$val['nama_klien'], $val['nama_perusahaan']],
+                        $this->greeting
+                    );
+                    $job->content .= $this->isi_html;
+                    $job->content .= $this->closing;
+                    $job->send_time = $this->schedule;
+
+                    $job->save();
+                }
+            }
+        }
     }
 }
