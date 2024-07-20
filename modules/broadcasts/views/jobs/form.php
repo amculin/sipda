@@ -94,10 +94,26 @@ use yii\widgets\ActiveForm;
 
                 <div class="mt-3 d-flex gap-2">
                     <a href="<?= Url::to(['index'], true); ?>" class="btn px-4"><i class="bi bi-arrow-left me-2"></i>Kembali</a>
-                    <a href="#" class="btn px-4"><i class="bi bi-view-list me-2"></i>Preview</a>
+                    <a href="#" id="preview-button" class="btn px-4" data-bs-toggle="modal" data-bs-target="#modal-form"><i class="bi bi-view-list me-2"></i>Preview</a>
                     <button class="btn btn-primary px-4" type="submit">Simpan</button>
                 </div>
             <?php ActiveForm::end(); ?>
+        </div>
+    </div>
+</div>
+<div class="modal fade modal-blur broadcast-email-form" id="modal-form" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+        <div class="modal-header">
+                <h5 class="modal-title">Preview Email</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <iframe style="width: 665px; height: 300px;" name="preview" id="preview"></iframe>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
         </div>
     </div>
 </div>
@@ -128,6 +144,29 @@ $js = "
 
         $('#broadcast-isi').val(content);
         $('#broadcast-isi_html').val(html);
+    });
+
+    $('#preview-button').click(function(){
+        const ifr = document.preview;
+        var title = $('#broadcast-judul').val();
+        var greeting = $('#broadcast-greeting').val();
+        var content = $('#broadcast-isi_html').val();
+        var closing = $('#broadcast-closing').val();
+        var html = '<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">';
+        html += '<html xmlns=\"http://www.w3.org/1999/xhtml\">';
+        html += '    <head>';
+        html += '        <title>' + title + '</title>';
+        html += '        <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />';
+        html += '    </head>';
+        html += '    <body>';
+        html += '        <p>' + greeting + '</p>';
+        html += '        ' + content;
+        html += '        <p>' + closing + '</p>';
+        html += '    </body>';
+        html += '</html>';
+
+        ifr.document.write(html);
+        ifr.document.close();
     });
 ";
 
