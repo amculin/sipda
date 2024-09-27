@@ -4,8 +4,11 @@ namespace app\modules\broadcasts\controllers;
 
 use Yii;
 use app\customs\FController;
+use app\models\ConfigSearch;
 use app\models\UserGrup as Role;
 use app\modules\broadcasts\models\BroadcastConfig;
+use app\modules\broadcasts\models\BroadcastLog;
+use app\modules\broadcasts\models\ChannelDetailSearch;
 use yii\web\Response;
 use yii\web\UploadedFile;
 use yii\widgets\ActiveForm;
@@ -15,6 +18,9 @@ use yii\widgets\ActiveForm;
  */
 class JobsController extends FController
 {
+    const FAILED = 0;
+    const SUCCESS = 1;
+
     public $allowedRoles = [Role::ADMIN, Role::SALES];
     public $additionalDataClass = [
         'create' => [
@@ -39,6 +45,39 @@ class JobsController extends FController
         return $this->renderPartial('view', [
             'model' => $this->findModel($id),
         ]);
+    }
+
+    public function actionRun($id)
+    {
+        $model = $this->findModel($id);
+        $contacts = ChannelDetailSearch::getContactByChannel($model->id_channel);
+        $configData = ConfigSearch::getData();
+
+        foreach ($contacts as $key => $val) {
+            $data = [
+                '{nama}' => $val['nama_klien'],
+                '{nama_perusahaan}' => $val['nama_perusahaan']
+            ];
+            $content = str_replace(['{nama}', '{nama_perusahaan}'], $data, $model->greeting);
+            $content .= str_replace(['{nama}', '{nama_perusahaan}'], $data, $model->isi_html);
+            $content .= str_replace(['{nama}', '{nama_perusahaan}'], $data, $model->closing);
+
+            $status = Yii::$app->mailer->compose()
+                ->setFrom(Yii::$app->params['adminEmail'])
+                ->setTo($val['email'])
+                ->setSubject($model->judul)
+                ->setHtmlBody($content)->send();
+
+            $log = new BroadcastLog();
+            $log->id_broadcast = $id;
+            $log->judul = $model->judul;
+            $log->nama_tujuan = $val['nama_klien'];
+            $log->email_tujuan = $val['email'];
+            $log->id_status = 1;
+            $log->save();
+        }
+
+        $this->redirect(['index']);
     }
 
     /**
