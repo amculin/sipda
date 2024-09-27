@@ -66,8 +66,7 @@ class ConfigurationsController extends Controller
 
         if ($this->request->isPost) {
             if ($model->load($this->request->post())) {
-                $model->smtp_password = $model->smtp_password == '' ? $tempPassword :
-                Yii::$app->getSecurity()->generatePasswordHash($model->smtp_password);
+                $model->smtp_password = $model->smtp_password == '' ? $tempPassword : $model->smtp_password;
 
                 if ($model->save()) {
                     return $this->redirect(['index']);
