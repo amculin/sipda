@@ -78,4 +78,17 @@ class BroadcastConfigSearch extends BroadcastConfig
 
         return $provider;
     }
+
+    public static function getConfigBySalesID($salesID)
+    {
+        $sql = "SELECT bc.greeting, bc.closing
+            FROM broadcast_config bc
+            WHERE bc.id_sales = :salesID";
+
+        $data = Yii::$app->db->createCommand($sql, [
+            ':salesID' => $salesID
+        ])->queryOne();
+
+        return $data;
+    }
 }

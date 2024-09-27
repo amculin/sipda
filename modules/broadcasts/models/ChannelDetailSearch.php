@@ -66,4 +66,18 @@ class ChannelDetailSearch extends ChannelDetail
 
         return $provider;
     }
+
+    public static function getContactByChannel($channelID)
+    {
+        $sql = "SELECT l.nama_klien, l.email, l.nama_perusahaan
+            FROM `channel_detail` cd
+            RIGHT JOIN `lead` l ON (l.id = cd.id_lead)
+            WHERE cd.id_channel = :channelID AND cd.is_deleted = :status";
+
+        $bound = [
+            ':channelID' => $channelID,
+            ':status' => self::IS_NOT_DELETED
+        ];
+        return Yii::$app->db->createCommand($sql, $bound)->queryAll();
+    }
 }
