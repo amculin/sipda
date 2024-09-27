@@ -1,16 +1,15 @@
 <?php
 
-namespace app\modules\prospects\models;
+namespace app\modules\sales\models;
 
 use Yii;
 use app\modules\references\models\Produk;
-use app\modules\prospects\models\Quotation;
 
 /**
- * This is the model class for table "quotation_detail".
+ * This is the model class for table "so_detail".
  *
  * @property int $id
- * @property int $id_quotation
+ * @property int $id_so
  * @property int $id_produk
  * @property string $kode_produk
  * @property string $nama_produk
@@ -21,16 +20,16 @@ use app\modules\prospects\models\Quotation;
  * @property float|null $diskon
  *
  * @property Produk $produk
- * @property Quotation $quotation
+ * @property SalesOrder $so
  */
-class QuotationDetail extends \yii\db\ActiveRecord
+class SalesOrderDetail extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
-        return 'quotation_detail';
+        return 'so_detail';
     }
 
     /**
@@ -39,12 +38,12 @@ class QuotationDetail extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['id_quotation', 'id_produk', 'kode_produk', 'nama_produk', 'nama_kategori', 'harga_jual', 'harga', 'jumlah'], 'required'],
-            [['id_quotation', 'id_produk', 'jumlah'], 'integer'],
+            [['id_so', 'id_produk', 'kode_produk', 'nama_produk', 'nama_kategori', 'harga_jual', 'harga', 'jumlah'], 'required'],
+            [['id_so', 'id_produk', 'jumlah'], 'integer'],
             [['harga_jual', 'harga', 'diskon'], 'number'],
             [['kode_produk'], 'string', 'max' => 32],
             [['nama_produk', 'nama_kategori'], 'string', 'max' => 128],
-            [['id_quotation'], 'exist', 'skipOnError' => true, 'targetClass' => Quotation::class, 'targetAttribute' => ['id_quotation' => 'id']],
+            [['id_so'], 'exist', 'skipOnError' => true, 'targetClass' => SalesOrder::class, 'targetAttribute' => ['id_so' => 'id']],
             [['id_produk'], 'exist', 'skipOnError' => true, 'targetClass' => Produk::class, 'targetAttribute' => ['id_produk' => 'id']],
         ];
     }
@@ -56,7 +55,7 @@ class QuotationDetail extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'id_quotation' => 'Id Quotation',
+            'id_so' => 'Id So',
             'id_produk' => 'Id Produk',
             'kode_produk' => 'Kode Produk',
             'nama_produk' => 'Nama Produk',
@@ -79,17 +78,12 @@ class QuotationDetail extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Quotation]].
+     * Gets query for [[So]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getQuotation()
+    public function getSo()
     {
-        return $this->hasOne(Quotation::class, ['id' => 'id_quotation']);
-    }
-
-    public static function getQuotationDetails($quotationId)
-    {
-        return self::findAll(['id_quotation' => $quotationId]);
+        return $this->hasOne(SalesOrder::class, ['id' => 'id_so']);
     }
 }

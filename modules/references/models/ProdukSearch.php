@@ -58,8 +58,9 @@ class ProdukSearch extends Produk
 
         $count = Yii::$app->db->createCommand('SELECT COUNT(*) FROM produk p' . $where, $bound)->queryScalar();
         $sql = "SELECT p.id, p.kode, p.nama, p.harga_pokok, p.harga_jual, p.jumlah_stock, k.nama AS `category` FROM produk p
-                LEFT JOIN kategori k ON (k.id = p.id_kategori)
-        {$where}";
+            LEFT JOIN kategori k ON (k.id = p.id_kategori)
+            {$where}
+            ORDER BY k.nama ASC, p.nama ASC";
 
         $config = [
             'sql' => $sql,
@@ -76,10 +77,11 @@ class ProdukSearch extends Produk
     }
 
     public static function getList() {
-        $sql = "SELECT p.id, CONCAT_WS(' - ', p.kode, p.nama) AS `name`
+        $sql = "SELECT p.id, CONCAT_WS(' - ', k.nama, p.kode, p.nama) AS `name`
             FROM `produk` p
+            LEFT join `kategori` k ON (k.id = p.id_kategori)
             WHERE p.id_unit = :unitID AND p.is_deleted = :status
-            ORDER BY p.kode ASC";
+            ORDER BY k.nama ASC, p.nama ASC";
         
         $data = Yii::$app->db->createCommand($sql, [
             ':unitID' => Yii::$app->user->identity->id_unit,

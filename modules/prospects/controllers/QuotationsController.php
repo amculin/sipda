@@ -131,4 +131,21 @@ class QuotationsController extends FController
             'message' => 'Sukses'
         ];
     }
+
+    public function actionGetDetail($id)
+    {
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            $model = ($this->searchModelClass)::getQuotationByID($id);
+
+            return [
+                'nama_klien' => $model['nama_klien'],
+                'nomor_telepon' =>$model['nomor_telepon'],
+                'email' => $model['email'],
+                'nama_perusahaan' => $model['nama_perusahaan'],
+                'id_lead' => $model['id_lead']
+            ];
+        }
+    }
 }

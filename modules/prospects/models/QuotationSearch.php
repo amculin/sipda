@@ -6,6 +6,7 @@ use Yii;
 use app\models\UserGrup as Role;
 use yii\base\Model;
 use yii\data\SqlDataProvider;
+use yii\helpers\ArrayHelper;
 
 /**
  * QuotationSearch represents the model behind the search form of `app\modules\prospects\models\Quotation`.
@@ -116,5 +117,33 @@ class QuotationSearch extends Quotation
     public static function createUniqueCode($lastCounter)
     {
         return 'SP' . date('Ym') . str_pad($lastCounter, 4, '0', STR_PAD_LEFT);
+    }
+
+    public static function getQuotationByID($id)
+    {
+        return self::findOne($id);
+    }
+
+    public static function getList() {
+        $bound = [
+            ':unitID' => Yii::$app->user->identity->id_unit,
+            ':status' => self::IS_NOT_DELETED
+        ];
+        $where = 'q.id_unit = :unitID AND q.is_deleted = :status';
+        
+        if ((Yii::$app->user->identity->id_grup == Role::SALES)) {
+            $salesID = Yii::$app->user->identity->id;
+            $where .= ' AND l.id_sales = :salesID';
+            $bound[':salesID'] = $salesID;
+        }
+
+        $sql = "SELECT q.id, CONCAT_WS(' - ', q.kode, l.kebutuhan, q.nama_perusahaan) AS `name`
+            FROM `quotation` q
+            LEFT JOIN `lead` l ON (l.id = q.id_lead)
+            WHERE {$where}";
+        
+        $data = Yii::$app->db->createCommand($sql, $bound)->queryAll();
+
+        return ArrayHelper::map($data, 'id', 'name');
     }
 }
