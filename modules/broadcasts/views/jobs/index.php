@@ -1,7 +1,8 @@
 <?php
 
-use app\modules\broadcasts\models\BroadcastStatusSearch as Status;
 use app\customs\FActionColumn;
+use app\models\UserGrup as Role;
+use app\modules\broadcasts\models\BroadcastStatusSearch as Status;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\GridView;
@@ -43,12 +44,15 @@ use yii\widgets\ActiveForm;
                             'method' => 'get',
                             'options' => ['style' => 'display: contents;']
                         ]);
-                        echo $form->field($searchModel, 'id_sales', ['options' => ['tag' => false]])->dropDownList($salesList, [
-                            'prompt' => 'Semua Sales',
-                            'class' => 'form-select',
-                            'style' => 'width: 200px;',
-                            'tag' => false
-                        ])->label(false);
+
+                        if (Yii::$app->user->identity->id_grup == Role::ADMIN) {
+                            echo $form->field($searchModel, 'id_sales', ['options' => ['tag' => false]])->dropDownList($salesList, [
+                                'prompt' => 'Semua Sales',
+                                'class' => 'form-select',
+                                'style' => 'width: 200px;',
+                                'tag' => false
+                            ])->label(false);
+                        }
 
                         $startYear = date('Y') - 3;
                         $yearList = [];

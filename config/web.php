@@ -28,7 +28,7 @@ $config = [
             'errorAction' => 'site/error',
         ],
         'mailer' => [
-            'class' => \yii\symfonymailer\Mailer::class,
+            'class' => \app\customs\FMailer::class,
             'viewPath' => '@app/mail',
             // send all mails to a file by default.
             'useFileTransport' => true,
