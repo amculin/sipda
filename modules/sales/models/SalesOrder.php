@@ -46,6 +46,7 @@ class SalesOrder extends \yii\db\ActiveRecord
 
     const APPROVAL_SCENARIO = 'approval-scenario';
     const UPDATE_SCENARIO = 'update-scenario';
+    const SOFT_DELETE_SCENARIO = 'soft-delete-scenario';
 
     public $product;
 
@@ -71,6 +72,9 @@ class SalesOrder extends \yii\db\ActiveRecord
             ],
             [
                 ['is_verified'], 'required', 'on' => self::APPROVAL_SCENARIO
+            ],
+            [
+                ['is_deleted'], 'required', 'on' => self::SOFT_DELETE_SCENARIO
             ],
             [['id_quotation', 'id_unit', 'id_lead', 'is_deleted', 'is_verified', 'counter'], 'integer'],
             [['tanggal', 'timestamp', 'year', 'product'], 'safe'],
@@ -187,6 +191,11 @@ class SalesOrder extends \yii\db\ActiveRecord
         return $this->scenario == $this::APPROVAL_SCENARIO;
     }
 
+    public function isUpdateScenario()
+    {
+        return $this->scenario == $this::UPDATE_SCENARIO;
+    }
+
     public function isApproved()
     {
         return $this->is_verified == $this::IS_VERIFIED;
@@ -244,7 +253,7 @@ class SalesOrder extends \yii\db\ActiveRecord
                 if ($this->isApproved()) {
                     $this->updateProductStock();
                 }
-            } else {
+            } elseif ($this->isUpdateScenario()) {
                 foreach ($this->product as $key => $val) {
                     if ($val['id'] == '') {
                         $product = new QuotationDetail();

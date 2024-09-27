@@ -87,7 +87,8 @@ class SalesOrderSearch extends SalesOrder
             LEFT JOIN `quotation` q ON (q.id = so.id_quotation)
             LEFT JOIN `lead` l ON (l.id = so.id_lead)
             LEFT JOIN `user` u ON (u.id = l.id_sales)
-            {$where}";
+            {$where}
+            ORDER BY so.id DESC";
 
         $config = [
             'sql' => $sql,

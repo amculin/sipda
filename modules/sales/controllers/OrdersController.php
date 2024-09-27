@@ -91,4 +91,25 @@ class OrdersController extends FController
             'message' => 'Sukses'
         ];
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function actionDelete($id)
+    {
+        Yii::$app->response->format = Response::FORMAT_JSON;
+
+        $model = $this->findModel($id);
+        $model->scenario = $model::SOFT_DELETE_SCENARIO;
+        $model->is_deleted = $model::IS_DELETED;
+
+        if (! $model->save()) {
+            throw new yii\web\UnprocessableEntityHttpException('Gagal');
+        }
+
+        return [
+            'code' => 200,
+            'message' => 'Sukses'
+        ];
+    }
 }
