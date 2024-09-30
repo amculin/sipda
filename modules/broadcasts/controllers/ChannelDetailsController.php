@@ -54,7 +54,7 @@ class ChannelDetailsController extends FController
                 ];
 
                 if (isset($this->additionalDataClass) && array_key_exists('create-from-lead', $this->additionalDataClass)) {
-                    foreach ($this->additionalDataClass['create'] as $key => $val) {
+                    foreach ($this->additionalDataClass['create-from-lead'] as $key => $val) {
                         $data[$key] = ($val)::getList();
                     }
                 }
