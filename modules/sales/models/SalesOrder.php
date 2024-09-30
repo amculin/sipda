@@ -74,6 +74,12 @@ class SalesOrder extends \yii\db\ActiveRecord
                 ], 'required'
             ],
             [
+                [
+                    'id_quotation', 'id_unit', 'id_lead', 'kode', 'tanggal', 'nama_klien', 'nama_perusahaan',
+                    'nomor_telepon', 'email', 'counter', 'year'
+                ], 'required', 'on' => self::UPDATE_SCENARIO
+            ],
+            [
                 ['is_verified'], 'required', 'on' => self::APPROVAL_SCENARIO
             ],
             [
@@ -249,22 +255,53 @@ class SalesOrder extends \yii\db\ActiveRecord
         }
     }
 
+    public function saveDetails($val)
+    {
+        $product = new SalesOrderDetail();
+        $product->id_so = $this->id;
+        $product->id_produk = $val['product_id'];
+        $product->kode_produk = $val['product_code'];
+        $product->nama_produk = $val['product_name'];
+        $product->nama_kategori = $val['product_category'];
+        $product->harga_jual = $val['product_base_price'];
+        $product->harga = $val['product_price'];
+        $product->jumlah = $val['product_quantity'];
+        $product->diskon = $val['product_discount'];
+
+        $product->save();
+    }
+
+    public function updateDetails($val)
+    {
+        $product = SalesOrderDetail::findOne($val['id']);
+        $product->id_produk = $val['product_id'];
+        $product->kode_produk = $val['product_code'];
+        $product->nama_produk = $val['product_name'];
+        $product->nama_kategori = $val['product_category'];
+        $product->harga_jual = $val['product_base_price'];
+        $product->harga = $val['product_price'];
+        $product->jumlah = $val['product_quantity'];
+        $product->diskon = $val['product_discount'];
+
+        $product->save();
+    }
+
     public function saveOrderDetails()
     {
         if (isset($this->product)) {
-            foreach ($this->product as $key => $val) {
-                $product = new SalesOrderDetail();
-                $product->id_so = $this->id;
-                $product->id_produk = $val['product_id'];
-                $product->kode_produk = $val['product_code'];
-                $product->nama_produk = $val['product_name'];
-                $product->nama_kategori = $val['product_category'];
-                $product->harga_jual = $val['product_base_price'];
-                $product->harga = $val['product_price'];
-                $product->jumlah = $val['product_quantity'];
-                $product->diskon = $val['product_discount'];
+            foreach ($this->product as $val) {
+                $this->saveDetails($val);
+            }
+        }
+    }
 
-                $product->save();
+    public function updateProducts()
+    {
+        foreach ($this->product as $val) {
+            if ($val['id'] == '') {
+                $this->saveDetails($val);
+            } else {
+                $this->updateDetails($val);
             }
         }
     }
@@ -282,22 +319,7 @@ class SalesOrder extends \yii\db\ActiveRecord
                     $this->updateProductStock();
                 }
             } elseif ($this->isUpdateScenario()) {
-                foreach ($this->product as $key => $val) {
-                    if ($val['id'] == '') {
-                        $product = new QuotationDetail();
-                        $product->id_so = $this->id;
-                        $product->id_produk = $val['product_id'];
-                        $product->kode_produk = $val['product_code'];
-                        $product->nama_produk = $val['product_name'];
-                        $product->nama_kategori = $val['product_category'];
-                        $product->harga_jual = $val['product_base_price'];
-                        $product->harga = $val['product_price'];
-                        $product->jumlah = $val['product_quantity'];
-                        $product->diskon = $val['product_discount'];
-
-                        $product->save();
-                    }
-                }
+                $this->updateProducts();
             }
         }
     }

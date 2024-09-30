@@ -47,29 +47,33 @@ $this->registerCss($css);
                 <div class="row justify-content-end">
                     <div class="col-lg-8">
                         <div class="mb-2">
-                            <label for="" class="form-label">Import dari Quotation</label>
-                            <a href="#" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#modal-import">Import</a>
-                            <div class="modal fade modal-blur" id="modal-import" tabindex="-1">
-                                <div class="modal-dialog modal-dialog-centered modal-lg">
-                                    <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Import Quotation</h5>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body">
-                                            <?php
-                                            echo $form->field($model, 'id_quotation', [
-                                                'options' => ['class' => 'mb-2']
-                                            ])->dropDownList($quotationList, ['prompt' => 'Pilih Quotation'])->label('Pilih Quotation', ['class' => 'form-label']);
-                                            ?>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                            <button type="button" class="btn btn-primary" id="quotation-selector" data-bs-dismiss="modal">Submit</button>
+                            <?php if ($model->isNewRecord) { ?>
+                                <label for="" class="form-label">Import dari Quotation</label>
+                                <a href="#" class="btn btn-default" data-bs-toggle="modal" data-bs-target="#modal-import">Import</a>
+                                <div class="modal fade modal-blur" id="modal-import" tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Import Quotation</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <?php
+                                                echo $form->field($model, 'id_quotation', [
+                                                    'options' => ['class' => 'mb-2']
+                                                ])->dropDownList($quotationList, ['prompt' => 'Pilih Quotation'])->label('Pilih Quotation', ['class' => 'form-label']);
+                                                ?>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                                <button type="button" class="btn btn-primary" id="quotation-selector" data-bs-dismiss="modal">Submit</button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            <?php } else {
+                                echo $form->field($model, 'id_quotation')->hiddenInput()->label(false);
+                            } ?>
                         </div>
                     </div>
                     <div class="col-lg-4">
@@ -166,7 +170,7 @@ $this->registerCss($css);
                             </tr>
                         </thead>
                         <tbody>
-                            <?= !$model->isNewRecord ? $this->render('_product-form', ['model' => $model]) : ''; ?>
+                            <?= !$model->isNewRecord ? $this->render('..\..\..\prospects\views\quotation-details\_product-form', ['model' => $model->salesOrderDetails]) : ''; ?>
                         </tbody>
                     </table>
                 </div>

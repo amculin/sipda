@@ -80,7 +80,7 @@ class ProdukSearch extends Produk
         $sql = "SELECT p.id, CONCAT_WS(' - ', k.nama, p.kode, p.nama) AS `name`
             FROM `produk` p
             LEFT join `kategori` k ON (k.id = p.id_kategori)
-            WHERE p.id_unit = :unitID AND p.is_deleted = :status
+            WHERE p.id_unit = :unitID AND p.jumlah_stock > 0 AND p.is_deleted = :status
             ORDER BY k.nama ASC, p.nama ASC";
         
         $data = Yii::$app->db->createCommand($sql, [

@@ -19,8 +19,11 @@ class OrdersController extends FController
         'index' => [
             'salesList' => 'app\models\UserSearch',
         ],
+        'create' => [
+            'productList' => 'app\modules\references\models\ProdukSearch',
+            'quotationList' => 'app\modules\prospects\models\QuotationSearch'
+        ],
         'edit' => [
-            'leadList' => 'app\modules\prospects\models\LeadSearch',
             'productList' => 'app\modules\references\models\ProdukSearch'
         ],
     ];
@@ -49,16 +52,53 @@ class OrdersController extends FController
             $model->loadDefaultValues();
         }
 
-        $quotationList = QuotationSearch::getList();
+        $data = [
+            'model' => $model,
+            'title' => 'Tambah ' . $this->title
+        ];
+
+        if (isset($this->additionalDataClass) && array_key_exists('create', $this->additionalDataClass)) {
+            foreach ($this->additionalDataClass['create'] as $key => $val) {
+                $data[$key] = ($val)::getList();
+            }
+        }
+
         $lastCounter = ($this->searchModelClass)::getLastCounter();
         $model->kode = ($this->searchModelClass)::createUniqueCode($lastCounter);
-        $productList = ProdukSearch::getList();
 
-        return $this->render('form', [
+        return $this->render('form', $data);
+    }
+
+    /**
+    * @inheritdoc
+    */
+    public function actionUpdate($id)
+    {
+        $model = $this->findModel($id);
+        $model->scenario = $model::UPDATE_SCENARIO;
+
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            return ActiveForm::validate($model);
+        }
+
+        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            return $this->redirect(['index']);
+        }
+
+        $data = [
             'model' => $model,
-            'quotationList' => $quotationList,
-            'productList' => $productList
-        ]);
+            'title' => 'Edit ' . $this->title
+        ];
+
+        if (isset($this->additionalDataClass) && array_key_exists('edit', $this->additionalDataClass)) {
+            foreach ($this->additionalDataClass['edit'] as $key => $val) {
+                $data[$key] = ($val)::getList();
+            }
+        }
+
+        return $this->render('form', $data);
     }
 
     /**
