@@ -75,4 +75,23 @@ class QuotationDetailsController extends FController
             return $this->redirect(['/prospects/quotations/update', 'id' => $model->id_quotation]);
         }
     }
+
+    public function actionGetDetails($quotationId)
+    {
+        if (Yii::$app->request->isAjax) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            $model = ($this->modelClass)::getQuotationDetails($quotationId);
+
+            $data = [];
+
+            if ($model) {
+                foreach ($model as $key => $val) {
+                    $data[$key] = $val->attributes;
+                }
+            }
+
+            return $this->renderAjax('_product-form', ['model' => $model]);
+        }
+    }
 }

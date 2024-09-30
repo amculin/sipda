@@ -1,38 +1,41 @@
 <?php
 
-namespace app\modules\prospects\controllers;
+namespace app\modules\sales\controllers;
 
 use Yii;
 use app\customs\FController;
 use app\models\UserGrup as Role;
-use app\modules\prospects\models\LeadSearch;
+use app\modules\prospects\models\QuotationSearch;
 use app\modules\references\models\ProdukSearch;
 use yii\web\Response;
 
 /**
- * QuotationsController implements the CRUD actions for Quotation model.
+ * OrdersController implements the CRUD actions for SalesOrder model.
  */
-class QuotationsController extends FController
+class OrdersController extends FController
 {
     public $allowedRoles = [Role::ADMIN, Role::SALES];
     public $additionalDataClass = [
         'index' => [
             'salesList' => 'app\models\UserSearch',
         ],
+        'create' => [
+            'productList' => 'app\modules\references\models\ProdukSearch',
+            'quotationList' => 'app\modules\prospects\models\QuotationSearch'
+        ],
         'edit' => [
-            'leadList' => 'app\modules\prospects\models\LeadSearch',
             'productList' => 'app\modules\references\models\ProdukSearch'
         ],
     ];
-    public $modelClass = 'app\modules\prospects\models\Quotation';
-    public $searchModelClass = 'app\modules\prospects\models\QuotationSearch';
-    public $title = 'Quotation';
+    public $modelClass = 'app\modules\sales\models\SalesOrder';
+    public $searchModelClass = 'app\modules\sales\models\SalesOrderSearch';
+    public $title = 'Sales Order';
     public $specialRules = ['approver' => [Role::ADMIN]];
 
     /**
      * @inheritdoc
      */
-    public function actionCreate($leadId = null)
+    public function actionCreate()
     {
         $model = new ($this->modelClass)();
 
@@ -41,32 +44,29 @@ class QuotationsController extends FController
                 return $this->redirect(['index']);
             } else {
                 echo '<pre>';
+                print_r($model->attributes);
                 print_r($model->getErrors());
+                exit();
             }
         } else {
             $model->loadDefaultValues();
         }
 
-        if (! is_null($leadId)) {
-            $lead = LeadSearch::getLeadByID($leadId);
-            $model->id_lead = $lead->id;
-            $model->id_tahapan = $lead->id_tahapan;
-            $model->nama_klien = $lead->nama_klien;
-            $model->nama_perusahaan = $lead->nama_perusahaan;
-            $model->nomor_telepon = $lead->nomor_telepon;
-            $model->email = $lead->email;
+        $data = [
+            'model' => $model,
+            'title' => 'Tambah ' . $this->title
+        ];
+
+        if (isset($this->additionalDataClass) && array_key_exists('create', $this->additionalDataClass)) {
+            foreach ($this->additionalDataClass['create'] as $key => $val) {
+                $data[$key] = ($val)::getList();
+            }
         }
 
-        $leadList = LeadSearch::getList();
         $lastCounter = ($this->searchModelClass)::getLastCounter();
         $model->kode = ($this->searchModelClass)::createUniqueCode($lastCounter);
-        $productList = ProdukSearch::getList();
 
-        return $this->render('form', [
-            'model' => $model,
-            'leadList' => $leadList,
-            'productList' => $productList
-        ]);
+        return $this->render('form', $data);
     }
 
     /**
@@ -75,14 +75,12 @@ class QuotationsController extends FController
     public function actionUpdate($id)
     {
         $model = $this->findModel($id);
-        $model->scenario = $model::SCENARIO_UPDATE;
+        $model->scenario = $model::UPDATE_SCENARIO;
 
-        if (Yii::$app->request->isAjax) {
-            if ($model->load(Yii::$app->request->post())) {
-                Yii::$app->response->format = Response::FORMAT_JSON;
-    
-                return ActiveForm::validate($model);
-            }
+        if (Yii::$app->request->isAjax && $model->load(Yii::$app->request->post())) {
+            Yii::$app->response->format = Response::FORMAT_JSON;
+
+            return ActiveForm::validate($model);
         }
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
@@ -115,11 +113,13 @@ class QuotationsController extends FController
         Yii::$app->response->format = Response::FORMAT_JSON;
 
         $model = $this->findModel($id);
+        $model->scenario = $model::APPROVAL_SCENARIO;
 
         if ($model->is_verified == $model::IS_VERIFIED) {
             $model->is_verified = $model::IS_REJECTED;
         } else {
             $model->is_verified = $model::IS_VERIFIED;
+            $model->comission = $model->countComission();
         }
 
         if (! $model->save()) {
@@ -132,20 +132,31 @@ class QuotationsController extends FController
         ];
     }
 
-    public function actionGetDetail($id)
+    /**
+     * @inheritdoc
+     */
+    public function actionDelete($id)
     {
-        if (Yii::$app->request->isAjax) {
-            Yii::$app->response->format = Response::FORMAT_JSON;
+        Yii::$app->response->format = Response::FORMAT_JSON;
 
-            $model = ($this->searchModelClass)::getQuotationByID($id);
+        $model = $this->findModel($id);
+        $model->scenario = $model::SOFT_DELETE_SCENARIO;
+        $model->is_deleted = $model::IS_DELETED;
 
-            return [
-                'nama_klien' => $model['nama_klien'],
-                'nomor_telepon' =>$model['nomor_telepon'],
-                'email' => $model['email'],
-                'nama_perusahaan' => $model['nama_perusahaan'],
-                'id_lead' => $model['id_lead']
-            ];
+        if (! $model->save()) {
+            throw new yii\web\UnprocessableEntityHttpException('Gagal');
         }
+
+        return [
+            'code' => 200,
+            'message' => 'Sukses'
+        ];
+    }
+
+    public function actionPrint($id)
+    {
+        $model = $this->findModel($id);
+
+        return $this->renderPartial('print', ['model' => $model]);
     }
 }

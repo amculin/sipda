@@ -3,6 +3,8 @@
 namespace app\modules\references\models;
 
 use Yii;
+use app\modules\prospects\models\QuotationDetail;
+use app\modules\sales\models\SalesOrderDetail;
 
 /**
  * This is the model class for table "produk".
@@ -20,7 +22,7 @@ use Yii;
  *
  * @property Kategori $kategori
  * @property QuotationDetail[] $quotationDetails
- * @property SoDetail[] $soDetails
+ * @property SalesOrderDetail[] $soDetails
  */
 class Produk extends \yii\db\ActiveRecord
 {
@@ -94,9 +96,9 @@ class Produk extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSoDetails()
+    public function getSalesOrderDetails()
     {
-        return $this->hasMany(SoDetail::class, ['id_produk' => 'id']);
+        return $this->hasMany(SalesOrderDetail::class, ['id_produk' => 'id']);
     }
 
     public function beforeValidate()
