@@ -66,7 +66,7 @@ class SalesOrderSearch extends SalesOrder
             $bound[':name'] = "%{$this->name}%";
         }
 
-        if ($this->is_verified) {
+        if ($this->is_verified != '') {
             $where .= ' AND so.is_verified = :isVerified';
             $bound[':isVerified'] = $this->is_verified;
         }
