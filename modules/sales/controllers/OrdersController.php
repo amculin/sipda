@@ -112,4 +112,11 @@ class OrdersController extends FController
             'message' => 'Sukses'
         ];
     }
+
+    public function actionPrint($id)
+    {
+        $model = $this->findModel($id);
+
+        return $this->renderPartial('print', ['model' => $model]);
+    }
 }

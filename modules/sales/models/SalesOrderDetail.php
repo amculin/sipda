@@ -3,6 +3,7 @@
 namespace app\modules\sales\models;
 
 use Yii;
+use app\customs\FCurrency;
 use app\modules\references\models\Produk;
 
 /**
@@ -24,6 +25,8 @@ use app\modules\references\models\Produk;
  */
 class SalesOrderDetail extends \yii\db\ActiveRecord
 {
+    use FCurrency;
+
     /**
      * {@inheritdoc}
      */
@@ -85,5 +88,25 @@ class SalesOrderDetail extends \yii\db\ActiveRecord
     public function getSo()
     {
         return $this->hasOne(SalesOrder::class, ['id' => 'id_so']);
+    }
+
+    public function getPrice()
+    {
+        return (int) $this->harga;
+    }
+    
+    public function setPrice($value)
+    {
+        $this->price = $value;
+    }
+
+    public function getDiscount()
+    {
+        return (int) $this->diskon;
+    }
+
+    public function setDiscount($value)
+    {
+        $this->discount = $value;
     }
 }

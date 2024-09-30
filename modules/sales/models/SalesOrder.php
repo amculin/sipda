@@ -3,6 +3,7 @@
 namespace app\modules\sales\models;
 
 use Yii;
+use app\customs\FCurrency;
 use app\models\Unit;
 use app\modules\prospects\models\Lead;
 use app\modules\prospects\models\Quotation;
@@ -38,6 +39,8 @@ use app\modules\prospects\models\Quotation;
  */
 class SalesOrder extends \yii\db\ActiveRecord
 {
+    use FCurrency;
+
     const IS_NOT_DELETED = 0;
     const IS_DELETED = 1;
 
@@ -164,6 +167,31 @@ class SalesOrder extends \yii\db\ActiveRecord
     public function getUnit()
     {
         return $this->hasOne(Unit::class, ['id' => 'id_unit']);
+    }
+
+    public function getStatus()
+    {
+        $statuses = [
+            $this::IS_REJECTED => 'Rejected',
+            $this::IS_VERIFIED => 'Verified'
+        ];
+
+        return $statuses[$this->is_verified];
+    }
+    
+    public function setStatus($value)
+    {
+        $this->status = $value;
+    }
+
+    public function getTax()
+    {
+        return (int) $this->pajak;
+    }
+    
+    public function setTax($value)
+    {
+        $this->tax = $value;
     }
 
     /**
