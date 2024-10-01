@@ -119,7 +119,7 @@ class OrdersController extends FController
             $model->is_verified = $model::IS_REJECTED;
         } else {
             $model->is_verified = $model::IS_VERIFIED;
-            $model->comission = $model->countComission();
+            //$model->comission = $model->countComission();
         }
 
         if (! $model->save()) {

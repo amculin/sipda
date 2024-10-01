@@ -80,4 +80,12 @@ class PlanSearch extends Plan
 
         return $provider;
     }
+
+    public static function getCurrentPlan($salesID)
+    {
+        return self::findOne([
+            'id_sales' => $salesID,
+            'tahun' => date('Y')
+        ]);
+    }
 }
