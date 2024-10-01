@@ -181,8 +181,8 @@ $approverRole = Role::ADMIN;
                                 'value' => function ($data) {
                                     $content = $data['project_name'];
 
-                                    if (strlen($data['project_name']) > 60) {
-                                        $content = substr($data['project_name'], 0, 60);
+                                    if (strlen($data['project_name']) > 50) {
+                                        $content = substr($data['project_name'], 0, 50);
                                         $content = substr($content, 0, strrpos($content, ' '));
                                         $content .= ' ...';
                                     }

@@ -3,15 +3,20 @@
 namespace app\modules\sales\models;
 
 use Yii;
+use app\customs\FCurrency;
 use yii\base\Model;
 use yii\data\SqlDataProvider;
+use yii\helpers\Json;
 
 /**
  * PlanSearch represents the model behind the search form of `app\modules\sales\models\Plan`.
  */
 class PlanSearch extends Plan
 {
+    use FCurrency;
+
     public $name;
+    public $saleTarget;
 
     /**
      * {@inheritdoc}
@@ -79,5 +84,35 @@ class PlanSearch extends Plan
         $provider = new SqlDataProvider($config);
 
         return $provider;
+    }
+
+    public static function getCurrentPlan($salesID)
+    {
+        $model = self::findOne([
+            'id_sales' => $salesID,
+            'tahun' => date('Y')
+        ]);
+
+        $model->parseSaleTarget();
+
+        return $model;
+    }
+
+    public function parseSaleTarget()
+    {
+        $month = (int) date('m');
+        $saleTarget = Json::decode($this->data, true)[$month]['sale_target'];
+
+        $this->setSaleTarget($saleTarget);
+    }
+
+    public function getSaleTarget()
+    {
+        return $this->saleTarget;
+    }
+
+    public function setSaleTarget($value)
+    {
+        $this->saleTarget = $value;
     }
 }

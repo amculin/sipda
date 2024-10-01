@@ -7,6 +7,7 @@ use app\customs\FCurrency;
 use app\models\Unit;
 use app\modules\prospects\models\Lead;
 use app\modules\prospects\models\Quotation;
+use yii\helpers\Json;
 
 /**
  * This is the model class for table "so".
@@ -235,15 +236,38 @@ class SalesOrder extends \yii\db\ActiveRecord
         return $this->is_verified == $this::IS_VERIFIED;
     }
 
-    public function countComission()
+    public function countSaleAndComission()
     {
         $comission = 0;
+        $totalSale = $this->sub_total - $this->diskon;
 
-        foreach ($this->salesOrderDetails as $key => $val) {
+        foreach ($this->salesOrderDetails as $val) {
             $comission = $comission + (($val->harga - $val->harga_jual) * $val->jumlah - $val->diskon);
         }
 
-        return $comission;
+        $plan = PlanSearch::getCurrentPlan($this->lead->id_sales);
+        $month = (int) date('m', strtotime($this->tanggal));
+        $year = (int) date('Y', strtotime($this->tanggal));
+        $saleTarget = Json::decode($plan->data, true)[$month]['sale_target'];
+
+        $model = ComissionSearch::findComission($this->lead->id_sales, $year, $month);
+        if (! $model) {
+            $model = new Comission();
+            $model->sales_id = $this->lead->id_sales;
+            $model->comission = $comission;
+            $model->total_sale = $totalSale;
+            $model->month = $month;
+            $model->year = $year;
+        } else {
+            $model->comission += $comission;
+            $model->total_sale += $totalSale;
+            $model->updated_date = date('Y-m-d H:i:s');
+        }
+
+        $model->is_achieved = ComissionSearch::targetAchieved($totalSale, $saleTarget) ?
+            Comission::IS_ACHIEVED : Comission::IS_NOT_ACHIEVED;
+
+        $model->save();
     }
 
     public function updateProductStock()
@@ -316,6 +340,7 @@ class SalesOrder extends \yii\db\ActiveRecord
         } else {
             if ($this->isApprovalScenario()) {
                 if ($this->isApproved()) {
+                    $this->countSaleAndComission();
                     $this->updateProductStock();
                 }
             } elseif ($this->isUpdateScenario()) {

@@ -109,4 +109,24 @@ class SalesOrderDetail extends \yii\db\ActiveRecord
     {
         $this->discount = $value;
     }
+
+    public static function getOrderedProducts(int $salesID, int $month, int $year)
+    {
+        $month = str_pad((string) $month, 2, '0', STR_PAD_LEFT);
+        $sql = "SELECT sd.kode_produk, sd.nama_produk, sd.nama_kategori, sd.harga_jual, sd.harga, sd.jumlah,
+                sd.diskon, so.tanggal, so.kode
+            FROM so_detail sd
+            LEFT JOIN so ON (so.id = sd.id_so)
+            LEFT JOIN `lead` l ON (so.id_lead = l.id)
+            WHERE so.tanggal LIKE :date AND l.id_sales = :salesID AND so.is_verified = :isVerified
+            ORDER BY so.kode ASC, sd.nama_produk ASC";
+        
+        $bound = [
+            ':date' => $year . '-' . $month . '%',
+            ':salesID' => $salesID,
+            ':isVerified' => SalesOrder::IS_VERIFIED
+        ];
+
+        return Yii::$app->db->createCommand($sql, $bound)->queryAll();
+    }
 }
