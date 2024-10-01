@@ -246,17 +246,18 @@ class SalesOrder extends \yii\db\ActiveRecord
         }
 
         $plan = PlanSearch::getCurrentPlan($this->lead->id_sales);
-        $month = (int) date('m');
+        $month = (int) date('m', strtotime($this->tanggal));
+        $year = (int) date('Y', strtotime($this->tanggal));
         $saleTarget = Json::decode($plan->data, true)[$month]['sale_target'];
 
-        $model = ComissionSearch::findComission($this->lead->id_sales);
+        $model = ComissionSearch::findComission($this->lead->id_sales, $year, $month);
         if (! $model) {
             $model = new Comission();
             $model->sales_id = $this->lead->id_sales;
             $model->comission = $comission;
             $model->total_sale = $totalSale;
-            $model->month = date('m');
-            $model->year = date('Y');
+            $model->month = $month;
+            $model->year = $year;
         } else {
             $model->comission += $comission;
             $model->total_sale += $totalSale;

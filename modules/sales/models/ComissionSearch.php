@@ -97,12 +97,12 @@ class ComissionSearch extends Comission
         return new SqlDataProvider($config);
     }
 
-    public static function findComission(int $salesID)
+    public static function findComission(int $salesID, int $year, int $month)
     {
         return self::findOne([
             'sales_id' => $salesID,
-            'month' => date('m'),
-            'year' => date('Y')
+            'month' => $month,
+            'year' => $year
         ]);
     }
 
