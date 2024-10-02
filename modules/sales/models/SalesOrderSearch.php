@@ -122,4 +122,18 @@ class SalesOrderSearch extends SalesOrder
     {
         return 'SO' . date('y') . '/' . date('dm') . '/' . str_pad($lastCounter, 7, '0', STR_PAD_LEFT);
     }
+
+    public static function getLastOrders()
+    {
+        $sql = 'SELECT so.kode, so.tanggal, so.nama_perusahaan, so.is_verified, l.kebutuhan, l.nilai
+            FROM so
+            LEFT JOIN `lead` l ON (l.id = so.id_lead)
+            WHERE l.id_sales = :salesID AND so.is_deleted = :isDeleted
+            ORDER BY so.id DESC LIMIT 3';
+
+        return Yii::$app->db->createCommand($sql, [
+            ':salesID' => Yii::$app->user->identity->id,
+            ':isDeleted' => self::IS_NOT_DELETED
+        ])->queryAll();
+    }
 }

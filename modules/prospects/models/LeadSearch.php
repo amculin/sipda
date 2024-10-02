@@ -189,4 +189,24 @@ class LeadSearch extends Lead
 
         return ArrayHelper::map($data, 'id', 'name');
     }
+
+    public function getLastLeads()
+    {
+        return $this::find()->select('id, nama_perusahaan, kebutuhan, timestamp')
+            ->where(['id_sales' => Yii::$app->user->identity->id])
+            ->andWhere(['is_deleted' => $this::IS_NOT_DELETED])
+            ->with('aktivitas')
+            ->limit(5)
+            ->all();
+    }
+
+    public function getLastActivities($leadID)
+    {
+        $sql = 'SELECT a.*
+                FROM aktivitas a
+                WHERE a.id_lead = :leadID
+                ORDER BY a.id DESC
+                LIMIT 1';
+        return Yii::$app->db->createCommand($sql, [':leadID' => $leadID])->queryOne();
+    }
 }

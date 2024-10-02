@@ -146,4 +146,18 @@ class QuotationSearch extends Quotation
 
         return ArrayHelper::map($data, 'id', 'name');
     }
+
+    public static function getLastQuotations()
+    {
+        $sql = 'SELECT q.kode, q.tanggal, q.nama_perusahaan, l.kebutuhan, l.nilai
+            FROM quotation q
+            LEFT JOIN `lead` l ON (l.id = q.id_lead)
+            WHERE q.is_deleted = :isDeleted AND l.id_sales = :salesID
+            LIMIT 5';
+
+        return Yii::$app->db->createCommand($sql, [
+            ':isDeleted' => self::IS_NOT_DELETED,
+            ':salesID' => Yii::$app->user->identity->id
+        ])->queryAll();
+    }
 }

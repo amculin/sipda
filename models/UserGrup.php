@@ -58,4 +58,14 @@ class UserGrup extends \yii\db\ActiveRecord
     {
         return $this->hasMany(User::class, ['id_grup' => 'id']);
     }
+
+    public static function isAdmin()
+    {
+        return Yii::$app->user->identity->id_grup == self::ADMIN;
+    }
+
+    public static function isSales()
+    {
+        return Yii::$app->user->identity->id_grup == self::SALES;
+    }
 }
