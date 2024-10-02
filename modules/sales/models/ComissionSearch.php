@@ -106,6 +106,15 @@ class ComissionSearch extends Comission
         ]);
     }
 
+    public static function getTotalAchievement(int $salesID)
+    {
+        return Yii::$app->db->createCommand('SELECT SUM(total_sale) AS total FROM comission c
+            WHERE c.sales_id = :salesID AND c.year = :year', [
+                ':salesID' => $salesID,
+                ':year' => date('Y')
+            ])->queryScalar();
+    }
+
     public function parseSaleTarget($data)
     {
         $month = (int) $data['month'];
